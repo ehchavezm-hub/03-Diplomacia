@@ -4,7 +4,9 @@
  * Busca dentro de una lista de documentos y los ordena por relevancia.
  * - No distingue mayúsculas ni tildes ("guerra fria" encuentra "Guerra Fría").
  * - Entiende algunos sinónimos en español e inglés ("ONU" = "Naciones Unidas").
- * - Da más peso al título que al resumen.
+ * - Solo muestra lo que coincide con todos los términos buscados.
+ * - Ordena de lo más reciente a lo más antiguo ("de hoy hacia atrás"); a igual
+ *   fecha, primero lo más relevante (el título pesa más que el resumen).
  *
  * Se usa en el navegador (window.MotorBusqueda) y en el servidor (require).
  */
@@ -105,7 +107,8 @@
 
   /** Convierte "1994", "1994-05" o "-0400" en un número para ordenar. */
   function valorFecha(fecha) {
-    var t = Date.parse(fecha);
+    fecha = String(fecha || '');
+    var t = Date.parse(/^\d{4}-\d{2}$/.test(fecha) ? fecha + '-01' : fecha);
     if (!isNaN(t) && /^\d{4}-\d{2}/.test(fecha)) return t;
     var anio = parseInt(fecha, 10);
     return isNaN(anio) ? -Infinity : Date.UTC(0, 0, 1) + (anio - 1900) * 31557600000;
@@ -115,7 +118,7 @@
    * Busca documentos.
    * @param {Array} documentos Lista de documentos (ver datos/catalogo.js).
    * @param {Object} opciones { consulta: "texto", tipo: "todos"|"noticia"|"paper"|"libro" }
-   * @returns {Array} Documentos ordenados: primero los más relevantes y, a igualdad, los más recientes.
+   * @returns {Array} Documentos ordenados de lo más reciente a lo más antiguo; a igual fecha, por relevancia.
    */
   function buscar(documentos, opciones) {
     opciones = opciones || {};
@@ -127,13 +130,19 @@
       .map(function (d) { return { doc: d, puntos: conceptos.length ? puntuar(d, conceptos) : 1 }; })
       .filter(function (r) { return r.puntos > 0; })
       .sort(function (a, b) {
-        return (b.puntos - a.puntos) || (valorFecha(b.doc.fecha) - valorFecha(a.doc.fecha));
+        return (valorFecha(b.doc.fecha) - valorFecha(a.doc.fecha)) || (b.puntos - a.puntos);
       })
       .map(function (r) { return r.doc; });
   }
 
+  /** Ordena cualquier lista de documentos de lo más reciente a lo más antiguo. */
+  function ordenarPorFecha(documentos) {
+    return documentos.slice().sort(function (a, b) { return valorFecha(b.fecha) - valorFecha(a.fecha); });
+  }
+
   var MotorBusqueda = {
     normalizar: normalizar,
+    ordenarPorFecha: ordenarPorFecha,
     interpretarConsulta: interpretarConsulta,
     buscar: buscar,
     valorFecha: valorFecha

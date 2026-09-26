@@ -108,7 +108,7 @@
 
     // Resumen o fragmento
     if (doc.fragmento) {
-      if (doc.capitulo) tarjeta.appendChild(crear('p', 'text-lg font-bold mb-2', doc.capitulo));
+      if (doc.capitulo) tarjeta.appendChild(crear('p', 't-cuerpo font-semibold mb-2', doc.capitulo));
       tarjeta.appendChild(crear('blockquote', 'fragmento', doc.resumen));
     } else {
       tarjeta.appendChild(crear('p', 'resumen-tarjeta', doc.resumen));

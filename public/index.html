@@ -13,7 +13,7 @@
   <!-- Fuente diseñada para personas con baja visión (si no carga, se usa Verdana). -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body class="bg-papel text-pizarra font-sans leading-relaxed">
@@ -26,18 +26,18 @@
       <a href="#buscar" class="flex items-center gap-3 no-underline text-white rounded-lg">
         <img src="img/icono.svg" alt="" width="56" height="56" class="w-14 h-14">
         <span>
-          <span class="block text-3xl font-bold leading-tight titular">Diplomacia Global</span>
-          <span class="block text-lg text-papel">Noticias, estudios y libros sobre las relaciones entre países</span>
+          <span class="block t-marca titular">Diplomacia Global</span>
+          <span class="block t-nota text-papel">Noticias, estudios y libros sobre las relaciones entre países</span>
         </span>
       </a>
 
       <div class="w-full md:w-auto flex flex-wrap items-center gap-3" role="group" aria-label="Opciones de lectura">
-        <span class="w-full sm:w-auto text-lg" id="etiqueta-tamano">Tamaño del texto:</span>
+        <span class="w-full sm:w-auto t-nota" id="etiqueta-tamano">Tamaño del texto:</span>
         <button type="button" id="btn-letra-menos" class="boton-cabecera" aria-describedby="etiqueta-tamano">
-          <span aria-hidden="true" class="text-xl">A−</span><span class="sr-only">Letra más pequeña</span>
+          <span aria-hidden="true" class="t-boton">A−</span><span class="sr-only">Letra más pequeña</span>
         </button>
         <button type="button" id="btn-letra-mas" class="boton-cabecera" aria-describedby="etiqueta-tamano">
-          <span aria-hidden="true" class="text-2xl">A+</span><span class="sr-only">Letra más grande</span>
+          <span aria-hidden="true" class="t-h2">A+</span><span class="sr-only">Letra más grande</span>
         </button>
         <button type="button" id="btn-ayuda" class="boton-cabecera gap-2">
           <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
@@ -83,15 +83,15 @@
 
     <!-- ======================= SECCIÓN: BUSCAR ======================= -->
     <section id="seccion-buscar" data-seccion="buscar" aria-labelledby="titulo-buscar">
-      <h1 id="titulo-buscar" class="titular text-4xl font-bold text-clarete mb-2" tabindex="-1">¿Qué desea encontrar?</h1>
-      <p class="text-xl mb-6">Escriba un tema, un país o el nombre de un autor y pulse el botón <strong>Buscar</strong>.</p>
+      <h1 id="titulo-buscar" class="titular t-h1 text-clarete mb-2" tabindex="-1">¿Qué desea encontrar?</h1>
+      <p class="t-cuerpo mb-6">Escriba un tema, un país o el nombre de un autor y pulse el botón <strong>Buscar</strong>.</p>
 
       <!-- ============ NOVEDADES DE LA ÚLTIMA SEMANA ============ -->
       <div class="caja-semana mb-8">
         <div class="flex-1">
-          <h2 class="titular text-2xl font-bold text-pizarra">¿Qué pasó esta semana en el mundo?</h2>
-          <p class="text-lg mt-1">Lo más importante de los <strong>últimos 7 días</strong>, solo de fuentes de gran prestigio: la ONU, Foreign Affairs, BBC, El País y revistas académicas líderes.</p>
-          <p class="text-lg mt-1 text-gris">Si antes escribe un tema en la caja de búsqueda, le mostraremos solo las novedades sobre ese tema.</p>
+          <h2 class="titular t-h2 text-pizarra">¿Qué pasó esta semana en el mundo?</h2>
+          <p class="t-cuerpo mt-1">Lo más importante de los <strong>últimos 7 días</strong>, solo de fuentes de gran prestigio: la ONU, Foreign Affairs, BBC, El País y revistas académicas líderes.</p>
+          <p class="t-nota mt-1 text-gris">Si antes escribe un tema en la caja de búsqueda, le mostraremos solo las novedades sobre ese tema.</p>
         </div>
         <button type="button" id="btn-semana" class="boton boton-semana">
           <svg class="icono-grande" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 15 2 2 4-4"/></svg>
@@ -100,29 +100,29 @@
       </div>
 
       <form id="formulario-busqueda" role="search" class="bg-white border-2 border-pizarra rounded-2xl p-5 md:p-8" novalidate>
-        <label for="caja-busqueda" class="block text-2xl font-bold text-pizarra mb-3">Escriba aquí un país, tema o autor</label>
+        <label for="caja-busqueda" class="block t-h2 text-pizarra mb-3">Escriba aquí un país, tema o autor</label>
         <div class="flex flex-col md:flex-row gap-3">
           <input id="caja-busqueda" name="q" type="search" autocomplete="off" enterkeyhint="search"
                  class="caja-busqueda flex-1"
                  placeholder="Por ejemplo: Guerra Fría o Tratados de Paz"
                  aria-describedby="ayuda-busqueda">
-          <button type="submit" class="boton boton-principal text-2xl px-8">
+          <button type="submit" class="boton boton-principal px-8">
             <svg class="icono-grande" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
             Buscar
           </button>
         </div>
-        <p id="ayuda-busqueda" class="text-lg mt-3 text-gris">Puede escribir en español o en inglés. No importan las mayúsculas ni las tildes.</p>
+        <p id="ayuda-busqueda" class="t-nota mt-3 text-gris">Puede escribir en español o en inglés. No importan las mayúsculas ni las tildes.</p>
 
         <div class="mt-4 flex flex-wrap items-center gap-3">
           <button type="button" id="btn-voz" class="boton boton-secundario" aria-describedby="estado-voz">
             <svg class="icono-grande" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M8 22h8"/></svg>
             <span id="texto-btn-voz">Buscar hablando</span>
           </button>
-          <span id="estado-voz" class="text-lg" aria-live="polite"></span>
+          <span id="estado-voz" class="t-nota" aria-live="polite"></span>
         </div>
 
         <fieldset class="mt-6">
-          <legend class="text-2xl font-bold text-pizarra mb-3">¿Qué busca?</legend>
+          <legend class="t-h2 text-pizarra mb-3">¿Qué busca?</legend>
           <div class="flex flex-wrap gap-3">
             <label class="pastilla"><input type="radio" name="tipo" value="todos" checked><span>Todos</span></label>
             <label class="pastilla"><input type="radio" name="tipo" value="noticia"><span><span aria-hidden="true">📰</span> Noticias</span></label>
@@ -133,7 +133,7 @@
       </form>
 
       <div class="mt-6">
-        <p class="text-xl font-bold text-pizarra mb-3">¿No sabe por dónde empezar? Pulse un tema:</p>
+        <p class="t-cuerpo font-semibold text-pizarra mb-3">¿No sabe por dónde empezar? Pulse un tema:</p>
         <div class="flex flex-wrap gap-3" id="sugerencias">
           <button type="button" class="sugerencia">Guerra Fría</button>
           <button type="button" class="sugerencia">Tratados de Paz</button>
@@ -146,7 +146,7 @@
       <div id="zona-resultados-buscar" class="mt-10">
         <div id="filtro-idioma" class="mb-5" hidden>
           <fieldset>
-            <legend class="text-xl font-bold text-pizarra mb-3">¿En qué idioma?</legend>
+            <legend class="t-cuerpo font-semibold text-pizarra mb-3">¿En qué idioma?</legend>
             <div class="flex flex-wrap gap-3">
               <label class="pastilla"><input type="radio" name="idioma" value="todos" checked><span>Todos los idiomas</span></label>
               <label class="pastilla"><input type="radio" name="idioma" value="es"><span>Solo en español</span></label>
@@ -160,32 +160,32 @@
 
     <!-- ======================= SECCIÓN: NOTICIAS ======================= -->
     <section id="seccion-noticias" data-seccion="noticias" aria-labelledby="titulo-noticias" hidden>
-      <h1 id="titulo-noticias" class="titular text-4xl font-bold text-clarete mb-2" tabindex="-1">Últimas Noticias</h1>
-      <p class="text-xl mb-6">Noticias de los últimos 7 días sobre diplomacia y relaciones entre países, de la más nueva a la más antigua. Solo de organismos internacionales y medios de referencia mundial.</p>
+      <h1 id="titulo-noticias" class="titular t-h1 text-clarete mb-2" tabindex="-1">Últimas Noticias</h1>
+      <p class="t-cuerpo mb-6">Noticias de los últimos 7 días sobre diplomacia y relaciones entre países, de la más nueva a la más antigua. Solo de organismos internacionales y medios de referencia mundial.</p>
       <p id="estado-noticias" class="estado-resultados" role="status" aria-live="polite"></p>
       <ol id="lista-noticias" class="lista-resultados" aria-labelledby="titulo-noticias"></ol>
     </section>
 
     <!-- ======================= SECCIÓN: PAPERS ======================= -->
     <section id="seccion-papers" data-seccion="papers" aria-labelledby="titulo-papers" hidden>
-      <h1 id="titulo-papers" class="titular text-4xl font-bold text-clarete mb-2" tabindex="-1">Papers Académicos</h1>
-      <p class="text-xl mb-6">Estudios de las revistas académicas más prestigiosas y documentos oficiales. Algunos se pueden descargar gratis.</p>
+      <h1 id="titulo-papers" class="titular t-h1 text-clarete mb-2" tabindex="-1">Papers Académicos</h1>
+      <p class="t-cuerpo mb-6">Estudios de las revistas académicas más prestigiosas y documentos oficiales. Algunos se pueden descargar gratis.</p>
       <p id="estado-papers" class="estado-resultados" role="status" aria-live="polite"></p>
       <ol id="lista-papers" class="lista-resultados" aria-labelledby="titulo-papers"></ol>
     </section>
 
     <!-- ======================= SECCIÓN: LIBROS ======================= -->
     <section id="seccion-libros" data-seccion="libros" aria-labelledby="titulo-libros" hidden>
-      <h1 id="titulo-libros" class="titular text-4xl font-bold text-clarete mb-2" tabindex="-1">Libros Destacados</h1>
-      <p class="text-xl mb-6">Obras clásicas y actuales para entender la diplomacia. Los libros antiguos de dominio público se pueden descargar.</p>
+      <h1 id="titulo-libros" class="titular t-h1 text-clarete mb-2" tabindex="-1">Libros Destacados</h1>
+      <p class="t-cuerpo mb-6">Obras clásicas y actuales para entender la diplomacia. Los libros antiguos de dominio público se pueden descargar.</p>
       <p id="estado-libros" class="estado-resultados" role="status" aria-live="polite"></p>
       <ol id="lista-libros" class="lista-resultados" aria-labelledby="titulo-libros"></ol>
     </section>
   </main>
 
   <footer class="bg-papel-suave border-t-4 border-clarete mt-12">
-    <div class="max-w-5xl mx-auto px-4 py-8 text-lg space-y-3">
-      <p class="titular text-xl font-bold text-clarete">Fuentes de prestigio que consultamos</p>
+    <div class="max-w-5xl mx-auto px-4 py-8 t-nota space-y-3">
+      <p class="titular t-h2 text-clarete">Fuentes de prestigio que consultamos</p>
       <p><strong>Organismos:</strong> Naciones Unidas (Noticias ONU). <strong>Análisis:</strong> Foreign Affairs, Foreign Policy, The Diplomat, International Crisis Group, Brookings.
          <strong>Medios de referencia:</strong> BBC, El País, France 24, DW, The Guardian, The New York Times, Al Jazeera.
          <strong>Revistas académicas:</strong> International Organization, International Security, World Politics, International Affairs y otras.
@@ -200,8 +200,8 @@
 
   <!-- ======================= VENTANA DE AYUDA ======================= -->
   <dialog id="dialogo-ayuda" class="dialogo" aria-labelledby="titulo-ayuda">
-    <h2 id="titulo-ayuda" class="titular text-3xl font-bold text-clarete mb-4">Cómo usar Diplomacia Global</h2>
-    <ol class="text-xl space-y-4 list-decimal pl-7">
+    <h2 id="titulo-ayuda" class="titular t-h1 text-clarete mb-4">Cómo usar Diplomacia Global</h2>
+    <ol class="t-cuerpo space-y-3 list-decimal pl-7">
       <li><strong>Escriba</strong> un tema en la caja grande (por ejemplo, «Guerra Fría») o pulse <strong>Buscar hablando</strong> y dígalo en voz alta.</li>
       <li>Si quiere, elija <strong>qué busca</strong>: noticias, papers o libros.</li>
       <li>Pulse el botón azul <strong>Buscar</strong>.</li>

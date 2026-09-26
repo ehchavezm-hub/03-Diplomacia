@@ -65,21 +65,18 @@
 
     DG.Datos.buscar({ consulta: consulta, tipo: tipo }).then(function (r) {
       mostrarAvisoServidor(r);
-      var resultados = r.resultados;
-      if (!consulta) {
-        // Sin texto: se muestran solo los recomendados para no abrumar.
-        var destacados = resultados.filter(function (d) { return d.destacado; });
-        if (destacados.length) resultados = destacados;
-      }
+      var resultados = r.resultados; // ya vienen de lo más reciente a lo más antiguo
       var n = resultados.length;
       var mensaje;
       if (!n) {
         mensaje = 'No encontramos resultados para «' + consulta + '»' + NOMBRE_TIPO[tipo] +
                   '. Pruebe con otras palabras, elija «Todos» o pulse uno de los temas sugeridos.';
       } else if (consulta) {
-        mensaje = 'Encontramos ' + plural(n, 'resultado', 'resultados') + ' para «' + consulta + '»' + NOMBRE_TIPO[tipo] + '.';
+        mensaje = 'Encontramos ' + plural(n, 'resultado', 'resultados') + ' para «' + consulta + '»' + NOMBRE_TIPO[tipo] +
+                  '. Los más recientes, primero.';
       } else {
-        mensaje = 'Le recomendamos estos ' + n + ' documentos' + NOMBRE_TIPO[tipo] + ' para empezar. Escriba un tema para buscar otros.';
+        mensaje = plural(n, 'publicación', 'publicaciones') + NOMBRE_TIPO[tipo] +
+                  ', de la más reciente a la más antigua. Escriba un tema para buscar algo concreto.';
       }
       DG.Interfaz.mostrarResultados(lista, estado, resultados, mensaje, acciones);
     });
@@ -160,10 +157,9 @@
     var estado = $('estado-' + seccion);
     DG.Interfaz.mostrarCargando(lista, estado);
     DG.Datos.buscar({ consulta: '', tipo: TIPO_DE_SECCION[seccion] }).then(function (r) {
-      // Primero los destacados, luego el resto.
-      var resultados = r.resultados.filter(function (d) { return d.destacado; })
-        .concat(r.resultados.filter(function (d) { return !d.destacado; }));
-      DG.Interfaz.mostrarResultados(lista, estado, resultados, resultados.length + ' documentos disponibles.', acciones);
+      var resultados = r.resultados; // de lo más reciente a lo más antiguo
+      DG.Interfaz.mostrarResultados(lista, estado, resultados,
+        plural(resultados.length, 'documento', 'documentos') + ', del más reciente al más antiguo.', acciones);
     });
   }
 
@@ -255,7 +251,7 @@
     mostrarSeccion(false);
     mostrarActualizacion();
 
-    // Al abrir la página, se muestran los destacados para que no aparezca vacía.
+    // Al abrir la página se muestra todo, de lo más reciente a lo más antiguo.
     buscar();
   }
 

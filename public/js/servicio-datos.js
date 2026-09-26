@@ -99,7 +99,8 @@
         var titulos = {};
         locales.forEach(function (d) { titulos[window.MotorBusqueda.normalizar(d.titulo)] = true; });
         var papers = r[1].filter(function (d) { return !titulos[window.MotorBusqueda.normalizar(d.titulo)]; });
-        return { resultados: locales.concat(papers), avisos: [], modo: m };
+        // Todo junto, de lo más reciente a lo más antiguo.
+        return { resultados: window.MotorBusqueda.ordenarPorFecha(locales.concat(papers)), avisos: [], modo: m };
       });
   }
 

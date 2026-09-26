@@ -17,7 +17,7 @@ module.exports = {
         purpura: '#593380'   // Purple Opinion: análisis
       },
       fontFamily: {
-        sans: ['"Atkinson Hyperlegible"', 'Verdana', '"Segoe UI"', 'Arial', 'sans-serif'],
+        sans: ['"Atkinson Hyperlegible Next"', '"Atkinson Hyperlegible"', 'Verdana', '"Segoe UI"', 'Arial', 'sans-serif'],
         titular: ['Georgia', '"Times New Roman"', 'serif']
       }
     }

@@ -56,6 +56,16 @@ describe('Motor de búsqueda', () => {
     assert.equal(Motor.buscar(catalogo, { consulta: 'Kissinger', tipo: 'noticia' }).length, 0);
   });
 
+  test('con un tema, también ordena de lo más reciente a lo más antiguo', () => {
+    const docs = [
+      { id: 'viejo', tipo: 'paper', titulo: 'Carta de la ONU', resumen: '', autor: '', fuente: '', fecha: '1945-06-26' },
+      { id: 'medio', tipo: 'paper', titulo: 'La ONU y la paz', resumen: '', autor: '', fuente: '', fecha: '2000-09' },
+      { id: 'nuevo', tipo: 'noticia', titulo: 'Debate en la ONU', resumen: '', autor: '', fuente: '', fecha: '2026-09-23T10:00:00.000Z' }
+    ];
+    assert.deepEqual(Motor.buscar(docs, { consulta: 'ONU' }).map((d) => d.id), ['nuevo', 'medio', 'viejo']);
+    assert.deepEqual(Motor.ordenarPorFecha([docs[0], docs[2], docs[1]]).map((d) => d.id), ['nuevo', 'medio', 'viejo']);
+  });
+
   test('el título pesa más que el resumen', () => {
     const [primero] = Motor.buscar(catalogo, { consulta: 'soft power' });
     assert.equal(primero.id, 'paper-nye-poder-blando');

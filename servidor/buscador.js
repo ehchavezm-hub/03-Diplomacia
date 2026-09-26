@@ -40,7 +40,7 @@ async function consultarFuente(fuente, consulta) {
  * @param {{consulta?: string, tipo?: string, limite?: number}} opciones
  * @returns {Promise<{resultados: Array, avisos: string[]}>}
  */
-async function buscar({ consulta = '', tipo = 'todos', limite = 30 } = {}) {
+async function buscar({ consulta = '', tipo = 'todos', limite = 200 } = {}) {
   const avisos = [];
   const quiere = (t) => tipo === 'todos' || tipo === t;
 
@@ -91,7 +91,8 @@ async function buscar({ consulta = '', tipo = 'todos', limite = 30 } = {}) {
     titulos.add(clave);
     unicos.push(d);
   }
-  return { resultados: unicos.slice(0, limite), avisos };
+  // De lo más reciente a lo más antiguo ("de hoy hacia atrás").
+  return { resultados: Motor.ordenarPorFecha(unicos).slice(0, limite), avisos };
 }
 
 /** Busca un documento por id (catálogo local o resultados externos vistos). */

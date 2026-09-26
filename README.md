@@ -272,13 +272,35 @@ combinación cumpla el contraste WCAG AA:
 
 El **Gray FT `#A8A49D`** de la plantilla no se usa para texto: sobre el fondo rosado solo alcanza
 2,2 : 1. En su lugar se usa Gray Dark FT. Los titulares van en letra con serifa (Georgia), como
-en la plantilla; el texto, en Atkinson Hyperlegible.
+en la plantilla; el texto, en Atkinson Hyperlegible Next.
+
+### Tamaños de letra
+
+| Elemento | Tamaño | Peso |
+|---|---|---|
+| Nombre «Diplomacia Global» | 25 px | Negrita (700) |
+| Encabezado H1 («¿Qué desea encontrar?») | 23 px | Negrita (700) |
+| Encabezado H2 («¿Qué pasó esta semana…?») y títulos de tarjeta | 19 px | Seminegrita (600)* |
+| Botones principales (Buscar, pestañas, filtros) | 15 px | Seminegrita (600) |
+| Texto de cuerpo (párrafos y resúmenes) | 16 px | Normal (400) |
+| Subtítulos y notas (fuente, fecha, ayudas) | 14 px | Normal (400) |
+
+\* Los titulares en Georgia se ven en negrita, porque esa letra no tiene seminegrita.
+Se definen en `public/css/estilos.css` (clases `t-marca`, `t-h1`, `t-h2`, `t-boton`,
+`t-cuerpo`, `t-nota`). Los botones **A+ / A−** agrandan o achican todos a la vez.
+
+### Orden de los resultados
+
+Todas las listas (búsqueda, novedades, noticias, papers y libros) van **de lo más reciente a lo
+más antiguo**. Al buscar un tema, se muestran solo los documentos que coinciden con él, y
+luego se ordenan por fecha: primero las noticias de hoy y, al final, los documentos históricos
+(por ejemplo, la Carta de la ONU de 1945).
 
 ## ♿ Accesibilidad (WCAG 2.1 AA)
 
-- Texto base de **18 px**, ampliable hasta 27 px con **A+**. Títulos de tarjeta de ~29 px.
+- Texto base de **16 px**, ampliable con **A+** hasta 24 px (escala 1,5).
 - Todo el texto supera **5 : 1** de contraste (el mínimo exigido es 4,5 : 1); los botones, **6,8 : 1**.
-- Botones y enlaces de **56 px** de alto como mínimo (se comprobó que ninguno baja de 44 px, en
+- Botones y enlaces de **46 px** de alto (se comprobó que ninguno baja de 44 px, en
   escritorio ni en celular).
 - Iconos **siempre acompañados de texto**.
 - Contorno de foco de 4 px para quien navega con teclado; enlace «Saltar al contenido».
