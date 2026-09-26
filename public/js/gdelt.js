@@ -23,15 +23,25 @@
 
   /**
    * @param {string} consulta  Lo que escribió la persona.
-   * @param {{maximo?: number}} op
+   * @param {{maximo?: number, terminos?: string[]}} op  terminos: lista de un tema sugerido.
    * @returns {string|null} Dirección de la consulta, o null si no hay palabras válidas.
    */
   function construirUrl(consulta, op) {
     op = op || {};
-    var palabras = terminos(consulta);
-    if (!palabras.length) return null;
-    // Varias palabras se buscan como frase exacta ("alberto fujimori"); una sola, tal cual.
-    var tema = palabras.length > 1 ? '"' + palabras.join(' ') + '"' : palabras[0];
+    var tema;
+    if (op.terminos && op.terminos.length) {
+      // Tema sugerido: cualquiera de sus primeros términos, entre paréntesis y con OR.
+      var lista = op.terminos.map(function (t) { return t.trim().replace(/"/g, ''); })
+        .filter(function (t) { return t.length >= 4; }).slice(0, 8)
+        .map(function (t) { return t.indexOf(' ') > -1 ? '"' + t + '"' : t; });
+      if (!lista.length) return null;
+      tema = '(' + lista.join(' OR ') + ')';
+    } else {
+      var palabras = terminos(consulta);
+      if (!palabras.length) return null;
+      // Varias palabras se buscan como frase exacta ("alberto fujimori"); una sola, tal cual.
+      tema = palabras.length > 1 ? '"' + palabras.join(' ') + '"' : palabras[0];
+    }
     var sitios = '(' + Fuentes.dominios.map(function (d) { return 'domainis:' + d.dominio; }).join(' OR ') + ')';
     var params = new URLSearchParams({
       query: tema + ' ' + sitios,

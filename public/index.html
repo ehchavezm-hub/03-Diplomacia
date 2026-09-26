@@ -134,13 +134,8 @@
 
       <div class="mt-6">
         <p class="t-cuerpo font-semibold text-pizarra mb-3">¿No sabe por dónde empezar? Pulse un tema:</p>
-        <div class="flex flex-wrap gap-3" id="sugerencias">
-          <button type="button" class="sugerencia">Guerra Fría</button>
-          <button type="button" class="sugerencia">Tratados de Paz</button>
-          <button type="button" class="sugerencia">Naciones Unidas</button>
-          <button type="button" class="sugerencia">Negociación</button>
-          <button type="button" class="sugerencia">Embajadas</button>
-        </div>
+        <!-- Los botones se crean desde js/temas.js (una sola lista para toda la aplicación). -->
+        <div id="sugerencias" class="grupos-temas"></div>
       </div>
 
       <div id="zona-resultados-buscar" class="mt-10">
@@ -230,6 +225,7 @@
   <script src="js/crossref.js?v=__VERSION__"></script>
   <script src="js/gdelt.js?v=__VERSION__"></script>
   <script src="js/libros.js?v=__VERSION__"></script>
+  <script src="js/temas.js?v=__VERSION__"></script>
   <script src="js/motor-busqueda.js?v=__VERSION__"></script>
   <script src="js/servicio-datos.js?v=__VERSION__"></script>
   <script src="js/interfaz.js?v=__VERSION__"></script>

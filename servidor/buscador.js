@@ -30,11 +30,11 @@ const cache = crearCache(config.cacheMinutos);
 // Resultados externos recientes, para poder descargarlos por su id.
 const vistos = new Map();
 
-async function consultarFuente(fuente, consulta) {
-  const clave = `${fuente.nombre}|${consulta}`;
+async function consultarFuente(fuente, consulta, terminos) {
+  const clave = `${fuente.nombre}|${consulta}|${(terminos || []).join('|')}`;
   const enCache = cache.obtener(clave);
   if (enCache) return enCache;
-  const docs = await fuente.buscar(consulta);
+  const docs = await fuente.buscar(consulta, terminos);
   cache.guardar(clave, docs);
   return docs;
 }
@@ -43,12 +43,12 @@ async function consultarFuente(fuente, consulta) {
  * @param {{consulta?: string, tipo?: string, limite?: number}} opciones
  * @returns {Promise<{resultados: Array, avisos: string[]}>}
  */
-async function buscar({ consulta = '', tipo = 'todos', limite = 200 } = {}) {
+async function buscar({ consulta = '', tipo = 'todos', terminos = null, limite = 200 } = {}) {
   const avisos = [];
   const quiere = (t) => tipo === 'todos' || tipo === t;
 
   // 1) Catálogo local: siempre.
-  const locales = Motor.buscar(await catalogoLocal.buscar(), { consulta, tipo });
+  const locales = Motor.buscar(await catalogoLocal.buscar(), { consulta, tipo, terminos });
 
   // 2) Biblioteca personal: solo si hay texto que buscar.
   let biblioteca = [];
@@ -64,11 +64,11 @@ async function buscar({ consulta = '', tipo = 'todos', limite = 200 } = {}) {
   let externos = [];
   if (config.fuentesEnVivo) {
     const activas = FUENTES_EN_VIVO.filter((f) => f.tipos.some(quiere));
-    const respuestas = await Promise.allSettled(activas.map((f) => consultarFuente(f, consulta)));
+    const respuestas = await Promise.allSettled(activas.map((f) => consultarFuente(f, consulta, terminos)));
     respuestas.forEach((r, i) => {
       if (r.status === 'fulfilled') {
         // Las noticias RSS llegan todas; se filtran aquí por la consulta.
-        const docs = activas[i] === noticiasRss ? Motor.buscar(r.value, { consulta }) : r.value;
+        const docs = activas[i] === noticiasRss ? Motor.buscar(r.value, { consulta, terminos }) : r.value;
         externos.push(...docs);
       } else {
         avisos.push(`${activas[i].nombre} no respondió; se muestran datos de respaldo.`);

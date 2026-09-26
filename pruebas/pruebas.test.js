@@ -182,6 +182,32 @@ describe('Fuentes de prestigio', () => {
   });
 });
 
+describe('Temas sugeridos', () => {
+  const Temas = require('../public/js/temas.js');
+  test('dos grupos con los 10 temas pedidos, cada uno con términos', () => {
+    assert.deepEqual(Temas.grupos.map((g) => g.titulo), ['Agenda Contemporánea', 'Agenda Clásica Vigente']);
+    assert.deepEqual(Temas.grupos.flatMap((g) => g.temas.map((t) => t.etiqueta)), [
+      'Ciberseguridad e IA', 'Diplomacia Climática', 'Geopolítica y Tecnología', 'Multipolaridad y BRICS',
+      'Seguridad Alimentaria', 'Derecho Internacional', 'Arbitraje y Conflictos', 'Organismos Multilaterales',
+      'Asuntos Consulares', 'Comercio e Integración']);
+    Temas.grupos.flatMap((g) => g.temas).forEach((t) => assert.ok(t.terminos.length >= 10, t.id));
+  });
+
+  test('un tema encuentra documentos con cualquiera de sus términos (y respeta palabras exactas)', () => {
+    const d = (id, titulo) => ({ id, tipo: 'noticia', titulo, resumen: '', fecha: '2026-09-20' });
+    const docs = [d('a', 'Nuevo ciberataque a ministerios'), d('b', 'Avances en IA generativa'),
+      d('c', 'La iglesia de Lima'), d('d', 'Cumbre del clima')];
+    const ids = Motor.buscar(docs, { terminos: Temas.porId('ciber-ia').terminos }).map((x) => x.id).sort();
+    assert.deepEqual(ids, ['a', 'b']);
+  });
+
+  test('en GDELT, un tema se busca con OR entre sus términos principales', () => {
+    const Gdelt = require('../public/js/gdelt.js');
+    const q = new URL(Gdelt.construirUrl('Diplomacia Climática', { terminos: Temas.porId('clima').terminos })).searchParams.get('query');
+    assert.match(q, /^\("cambio climatico" OR "climate change" OR /);
+  });
+});
+
 describe('Buscador de noticias (GDELT)', () => {
   const Gdelt = require('../public/js/gdelt.js');
 

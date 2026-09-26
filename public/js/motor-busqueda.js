@@ -80,10 +80,12 @@
 
   function contiene(textoNormalizado, variante) {
     // Coincide al inicio de una palabra: "tratad" encuentra "tratados".
-    return (' ' + textoNormalizado).indexOf(' ' + variante) > -1;
+    // Si la variante termina en espacio, debe ser la palabra completa ("ia " no encuentra "iglesia").
+    return (' ' + textoNormalizado + ' ').indexOf(' ' + variante) > -1;
   }
 
-  function puntuar(doc, conceptos) {
+  /** @param {boolean} cualquiera  true: basta con un concepto (temas); false: deben estar todos. */
+  function puntuar(doc, conceptos, cualquiera) {
     var campos = {
       titulo: normalizar(doc.titulo),
       etiquetas: normalizar((doc.etiquetas || []).join(' ')),
@@ -99,7 +101,7 @@
           if (contiene(campos[campo], conceptos[i][j])) mejor = Math.max(mejor, PESOS[campo]);
         }
       }
-      if (mejor === 0) return 0; // Falta un concepto: no es relevante.
+      if (mejor === 0 && !cualquiera) return 0; // Falta un concepto: no es relevante.
       total += mejor;
     }
     return total;
@@ -114,20 +116,31 @@
     return isNaN(anio) ? -Infinity : Date.UTC(0, 0, 1) + (anio - 1900) * 31557600000;
   }
 
+  /** Términos de un tema: cada uno es un concepto; el espacio final (palabra exacta) se conserva. */
+  function conceptosDeTerminos(terminos) {
+    return (terminos || []).map(function (t) {
+      var exacto = /\s$/.test(t);
+      return [normalizar(t) + (exacto ? ' ' : '')];
+    }).filter(function (c) { return c[0].trim(); });
+  }
+
   /**
    * Busca documentos.
    * @param {Array} documentos Lista de documentos (ver datos/catalogo.js).
-   * @param {Object} opciones { consulta: "texto", tipo: "todos"|"noticia"|"paper"|"libro" }
+   * @param {Object} opciones { consulta: "texto", tipo: "todos"|"noticia"|"paper"|"libro",
+   *                            terminos: [lista de un tema sugerido; basta con que aparezca uno] }
    * @returns {Array} Documentos ordenados de lo más reciente a lo más antiguo; a igual fecha, por relevancia.
    */
   function buscar(documentos, opciones) {
     opciones = opciones || {};
     var tipo = opciones.tipo || 'todos';
-    var conceptos = interpretarConsulta(opciones.consulta || '');
+    // Un tema sugerido trae su lista de términos: basta con que aparezca cualquiera.
+    var cualquiera = !!(opciones.terminos && opciones.terminos.length);
+    var conceptos = cualquiera ? conceptosDeTerminos(opciones.terminos) : interpretarConsulta(opciones.consulta || '');
 
     return documentos
       .filter(function (d) { return tipo === 'todos' || d.tipo === tipo; })
-      .map(function (d) { return { doc: d, puntos: conceptos.length ? puntuar(d, conceptos) : 1 }; })
+      .map(function (d) { return { doc: d, puntos: conceptos.length ? puntuar(d, conceptos, cualquiera) : 1 }; })
       .filter(function (r) { return r.puntos > 0; })
       .sort(function (a, b) {
         return (valorFecha(b.doc.fecha) - valorFecha(a.doc.fecha)) || (b.puntos - a.puntos);

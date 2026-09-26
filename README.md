@@ -63,6 +63,17 @@ Los resultados se muestran en **dos secciones: Nacional (Perú) e Internacional*
 lo más reciente a lo más antiguo. Las noticias se clasifican según el medio; los papers y libros,
 según si tratan del Perú.
 
+### Temas sugeridos
+
+Debajo del buscador hay botones de temas en dos grupos (se editan en **`public/js/temas.js`**):
+
+- 🌐 **Agenda Contemporánea:** Ciberseguridad e IA · Diplomacia Climática · Geopolítica y Tecnología · Multipolaridad y BRICS · Seguridad Alimentaria
+- 🏛️ **Agenda Clásica Vigente:** Derecho Internacional · Arbitraje y Conflictos · Organismos Multilaterales · Asuntos Consulares · Comercio e Integración
+
+Cada tema no busca su nombre literal, sino **cualquiera** de sus términos clave en español e
+inglés (por ejemplo, «Diplomacia Climática» = cambio climático, COP30, Acuerdo de París,
+emisiones, climate change…). Funciona igual con el botón de novedades de la semana.
+
 ### Solo fuentes de prestigio
 
 La lista completa está en **`public/js/fuentes-prestigio.js`** (para añadir o quitar una fuente,

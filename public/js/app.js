@@ -13,6 +13,53 @@
   var cargadas = {};
   var vista = 'busqueda'; // 'busqueda' o 'semana': qué se muestra en la zona de resultados
   var turnoBusqueda = 0;  // evita que una respuesta lenta reemplace a una búsqueda más nueva
+  var temaActivo = null;  // tema sugerido elegido (busca cualquiera de sus términos)
+
+  /** Términos del tema activo, solo si la caja sigue mostrando su nombre. */
+  function terminosActivos() {
+    return temaActivo && $('caja-busqueda').value.trim() === temaActivo.etiqueta ? temaActivo.terminos : null;
+  }
+
+  /** Dibuja los botones de temas sugeridos, agrupados (desde js/temas.js). */
+  function dibujarTemas() {
+    var contenedor = $('sugerencias');
+    window.Temas.grupos.forEach(function (g) {
+      var grupo = document.createElement('div');
+      grupo.className = 'grupo-temas';
+      grupo.setAttribute('data-grupo', g.id);
+      grupo.setAttribute('role', 'group');
+      var titulo = document.createElement('h3');
+      titulo.className = 'titular t-h2';
+      var icono = document.createElement('span');
+      icono.setAttribute('aria-hidden', 'true');
+      icono.textContent = g.icono;
+      titulo.appendChild(icono);
+      titulo.appendChild(document.createTextNode(g.titulo));
+      titulo.id = 'grupo-' + g.id;
+      grupo.setAttribute('aria-labelledby', titulo.id);
+      grupo.appendChild(titulo);
+      var botones = document.createElement('div');
+      botones.className = 'flex flex-wrap gap-2';
+      g.temas.forEach(function (t) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'sugerencia';
+        b.setAttribute('data-tema', t.id);
+        b.setAttribute('aria-pressed', 'false');
+        b.textContent = t.etiqueta;
+        botones.appendChild(b);
+      });
+      grupo.appendChild(botones);
+      contenedor.appendChild(grupo);
+    });
+  }
+
+  function marcarTema() {
+    var activo = terminosActivos() ? temaActivo.id : null;
+    document.querySelectorAll('.sugerencia').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-tema') === activo));
+    });
+  }
 
   var acciones = {
     alDescargar: function () {
@@ -89,10 +136,15 @@
         if (n) estado.textContent += ' Seguimos buscando más en agencias y medios de prestigio…';
         estado.classList.add('cargando');
       }
-      if (consulta && !buscandoMas && (tipo === 'todos' || tipo === 'noticia')) zona.appendChild(enlaceGoogleNoticias(consulta));
+      if (consulta && !buscandoMas && (tipo === 'todos' || tipo === 'noticia')) {
+        var t = terminosActivos();
+        // Para un tema, se buscan en Google Noticias sus tres términos principales.
+        zona.appendChild(enlaceGoogleNoticias(consulta, t ? t.slice(0, 3).map(function (x) { return '"' + x.trim() + '"'; }).join(' OR ') : null));
+      }
     }
 
-    DG.Datos.buscar({ consulta: consulta, tipo: tipo }).then(function (r) {
+    marcarTema();
+    DG.Datos.buscar({ consulta: consulta, tipo: tipo, terminos: terminosActivos() }).then(function (r) {
       if (turno !== turnoBusqueda) return; // llegó una búsqueda más nueva
       mostrarAvisoServidor(r);
       // Paso 1: lo guardado, enseguida (ya viene de lo más reciente a lo más antiguo).
@@ -105,6 +157,11 @@
           if (turno === turnoBusqueda) mostrar(r.resultados, false);
         });
       }
+    }).catch(function () {
+      // Si algo inesperado falla, nunca dejar a la persona esperando.
+      if (turno !== turnoBusqueda) return;
+      estado.classList.remove('cargando');
+      estado.textContent = 'No pudimos completar la búsqueda en este momento. Por favor, inténtelo de nuevo.';
     });
   }
 
@@ -113,10 +170,10 @@
                          'bbc.com', 'elpais.com', 'reuters.com', 'apnews.com', 'dw.com'];
 
   /** Enlace para seguir buscando el tema en Google Noticias, solo en medios de prestigio. */
-  function enlaceGoogleNoticias(consulta) {
+  function enlaceGoogleNoticias(consulta, consultaGoogle) {
     var sitios = SITIOS_RESPALDO.map(function (s) { return 'site:' + s; }).join(' OR ');
     var url = 'https://news.google.com/search?' + new URLSearchParams({
-      q: consulta + ' (' + sitios + ')', hl: 'es-419', gl: 'PE', ceid: 'PE:es-419'
+      q: '(' + (consultaGoogle || consulta) + ') (' + sitios + ')', hl: 'es-419', gl: 'PE', ceid: 'PE:es-419'
     }).toString();
     var caja = document.createElement('p');
     caja.className = 'busqueda-respaldo';
@@ -143,7 +200,8 @@
     DG.Interfaz.mostrarCargandoZona(zona, estado);
     estado.textContent = 'Buscando las novedades de la última semana… un momento, por favor.';
 
-    DG.Datos.semana({ consulta: consulta, idioma: idiomaElegido() }).then(function (r) {
+    marcarTema();
+    DG.Datos.semana({ consulta: consulta, terminos: terminosActivos(), idioma: idiomaElegido() }).then(function (r) {
       if (turno !== turnoBusqueda) return;
       var resultados = r.resultados.filter(function (d) { return tipo === 'todos' || d.tipo === tipo; });
       var sobre = consulta ? ' sobre «' + consulta + '»' : '';
@@ -278,10 +336,12 @@
       radio.addEventListener('change', verSemana);
     });
 
+    dibujarTemas();
     $('sugerencias').addEventListener('click', function (e) {
       var boton = e.target.closest('.sugerencia');
       if (!boton) return;
-      $('caja-busqueda').value = boton.textContent;
+      temaActivo = window.Temas.porId(boton.getAttribute('data-tema'));
+      $('caja-busqueda').value = temaActivo.etiqueta;
       buscar();
       $('estado-buscar').scrollIntoView({ block: 'start' });
     });

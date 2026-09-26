@@ -177,6 +177,16 @@ header :focus-visible { outline-color: var(--azafran); }
   border: 2px solid var(--pizarra); border-radius: 0.75rem; cursor: pointer;
 }
 .sugerencia:hover { background: var(--papel-palido); }
+.sugerencia[aria-pressed="true"] { background: var(--pizarra); color: #fff; }
+
+/* ---------- Grupos de temas sugeridos ---------- */
+.grupos-temas { display: grid; gap: 1rem; }
+@media (min-width: 900px) { .grupos-temas { grid-template-columns: 1fr 1fr; } }
+.grupo-temas {
+  padding: 0.9rem 1rem; background: #fff; border: 2px solid var(--papel-palido); border-radius: 0.9rem;
+}
+.grupo-temas h3 { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.6rem; color: var(--clarete); }
+.grupo-temas[data-grupo="clasica"] h3 { color: var(--oxford); }
 
 /* ---------- Resultados ---------- */
 .estado-resultados { font-size: 1.1875rem; font-weight: 600; color: var(--pizarra); margin-bottom: 1rem; }

@@ -72,7 +72,9 @@ function servirArchivo(res, rutaUrl) {
 async function manejarBusqueda(res, parametros) {
   const consulta = (parametros.get('q') || '').slice(0, 200);
   const tipo = TIPOS_VALIDOS.includes(parametros.get('tipo')) ? parametros.get('tipo') : 'todos';
-  const datos = await buscador.buscar({ consulta, tipo });
+  // t = términos de un tema sugerido, separados por "|" (se busca cualquiera de ellos).
+  const terminos = (parametros.get('t') || '').split('|').map((x) => x.slice(0, 60)).filter((x) => x.trim()).slice(0, 40);
+  const datos = await buscador.buscar({ consulta, tipo, terminos: terminos.length ? terminos : null });
   responderJson(res, 200, { consulta, tipo, total: datos.resultados.length, ...datos });
 }
 

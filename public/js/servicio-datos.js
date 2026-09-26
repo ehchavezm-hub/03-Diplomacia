@@ -118,15 +118,20 @@
         return !isNaN(t) && t >= limite;
       });
       if (op.idioma === 'es') lista = lista.filter(function (x) { return x.idioma === 'es'; });
-      if (op.consulta) lista = window.MotorBusqueda.buscar(lista, { consulta: op.consulta });
+      if (op.consulta || op.terminos) lista = window.MotorBusqueda.buscar(lista, { consulta: op.consulta, terminos: op.terminos });
       return { generado: d.generado, dias: d.dias || 7, fuentes: d.fuentes, resultados: window.MotorBusqueda.ordenarPorFecha(lista) };
     });
   }
 
   /* ------------------------------ Búsqueda ------------------------------ */
 
-  function buscarNoticias(consulta) {
-    var url = window.Gdelt.construirUrl(consulta);
+  /** Para servicios que no entienden listas: los primeros términos del tema, sin espacios extra. */
+  function textoDeTerminos(consulta, terminos) {
+    return terminos ? terminos.slice(0, 4).map(function (t) { return t.trim(); }).join(' ') : consulta;
+  }
+
+  function buscarNoticias(consulta, terminos) {
+    var url = window.Gdelt.construirUrl(consulta, { terminos: terminos });
     if (!url) return Promise.resolve([]);
     // GDELT puede tardar 10-20 segundos en responder.
     return traerTexto(url, 30000).then(window.Gdelt.interpretar).catch(function () { return []; });
@@ -165,6 +170,7 @@
   function buscarSinServidor(opciones, m) {
     var tipo = opciones.tipo || 'todos';
     var consulta = opciones.consulta || '';
+    var terminos = opciones.terminos || null;
     var enVivo = consulta && m === 'web';
     var quiere = function (t) { return tipo === 'todos' || tipo === t; };
 
@@ -181,14 +187,14 @@
 
       var masResultados = null;
       if (enVivo) {
-        masResultados = Promise.all([
-          quiere('noticia') ? buscarNoticias(consulta) : [],
-          quiere('paper') ? buscarPapers(consulta) : [],
-          quiere('libro') ? buscarLibros(consulta) : []
-        ]).then(function (v) {
+        masResultados = Promise.resolve().then(function () { return Promise.all([
+          quiere('noticia') ? buscarNoticias(consulta, terminos) : [],
+          quiere('paper') ? buscarPapers(textoDeTerminos(consulta, terminos)) : [],
+          quiere('libro') ? buscarLibros(terminos ? terminos[0].trim() : consulta) : []
+        ]); }).then(function (v) {
           var enLinea = v[0].concat(v[1], v[2]).filter(function (d) { return quiere(d.tipo); });
           return unirResultados([guardados, enLinea]);
-        });
+        }).catch(function () { return guardados; });
       }
       return { resultados: guardados, avisos: [], modo: m, masResultados: masResultados };
     });
@@ -202,7 +208,8 @@
     return modo().then(function (m) {
       if (m !== 'servidor') return buscarSinServidor(opciones, m);
       var url = 'api/buscar?q=' + encodeURIComponent(opciones.consulta || '') +
-                '&tipo=' + encodeURIComponent(opciones.tipo || 'todos');
+                '&tipo=' + encodeURIComponent(opciones.tipo || 'todos') +
+                (opciones.terminos ? '&t=' + encodeURIComponent(opciones.terminos.join('|')) : '');
       return traer(url, 25000)
         .then(function (d) { return { resultados: conAmbito(d.resultados), avisos: d.avisos || [], modo: m }; })
         .catch(function () { return buscarSinServidor(opciones, 'web'); });

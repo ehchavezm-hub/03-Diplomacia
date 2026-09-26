@@ -47,9 +47,10 @@ module.exports = {
   obtenerRecientes,
 
   /** Libros de editoriales de prestigio sobre un tema. */
-  async buscar(consulta) {
+  async buscar(consulta, terminos) {
     if (!consulta) return [];
-    const json = await traerJson(Libros.urlGoogle({ q: consulta, recientes: false }), config.tiempoEsperaMs);
-    return Libros.interpretarGoogle(json);
+    // Open Library (Google Books rechaza consultas sin clave por límite de uso).
+    const json = await traerJson(Libros.urlOpenLibrary(terminos ? terminos[0].trim() : consulta), config.tiempoEsperaMs);
+    return Libros.interpretarOpenLibrary(json);
   }
 };

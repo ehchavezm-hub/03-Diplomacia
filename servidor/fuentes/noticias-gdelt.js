@@ -12,8 +12,8 @@ module.exports = {
   nombre: 'Buscador de noticias (GDELT)',
   tipos: ['noticia'],
 
-  async buscar(consulta) {
-    const url = Gdelt.construirUrl(consulta);
+  async buscar(consulta, terminos) {
+    const url = Gdelt.construirUrl(consulta, { terminos });
     if (!url) return [];
     const respuesta = await traerConTiempo(url, config.tiempoEsperaMs * 2);
     return Gdelt.interpretar(await respuesta.text());

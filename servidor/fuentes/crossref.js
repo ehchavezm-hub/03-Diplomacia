@@ -23,8 +23,9 @@ module.exports = {
   consultar,
 
   /** Papers de revistas de prestigio sobre un tema (Crossref necesita un tema). */
-  async buscar(consulta) {
+  async buscar(consulta, terminos) {
     if (!consulta) return [];
-    return consultar({ consulta, filas: 10 });
+    const texto = terminos ? terminos.slice(0, 4).map((t) => t.trim()).join(' ') : consulta;
+    return consultar({ consulta: texto, filas: 10 });
   }
 };
