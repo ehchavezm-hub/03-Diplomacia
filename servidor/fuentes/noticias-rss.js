@@ -24,7 +24,7 @@ function enlaceAtom(xml) {
 
 /** Dirección RSS de Google Noticias limitada a un sitio (para agencias y entidades sin RSS). */
 function urlGoogleNoticias(medio) {
-  const params = new URLSearchParams({ q: `${medio.googleNoticias} when:3d`, hl: 'es-419', gl: 'PE', ceid: 'PE:es-419' });
+  const params = new URLSearchParams({ q: `${medio.googleNoticias} when:7d`, hl: 'es-419', gl: 'PE', ceid: 'PE:es-419' });
   return `https://news.google.com/rss/search?${params}`;
 }
 

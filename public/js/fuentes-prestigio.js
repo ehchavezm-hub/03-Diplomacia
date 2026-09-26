@@ -53,7 +53,7 @@
 
     // Agencias de noticias internacionales (sin RSS público: se leen a través de Google Noticias)
     { id: 'reuters', nombre: 'Reuters', tipoFuente: 'Agencia internacional de noticias', idioma: 'en', ambito: 'internacional', especializado: false,
-      googleNoticias: 'site:reuters.com/world' },
+      googleNoticias: 'site:reuters.com' },
     { id: 'ap', nombre: 'Associated Press', tipoFuente: 'Agencia internacional de noticias', idioma: 'en', ambito: 'internacional', especializado: false,
       googleNoticias: 'site:apnews.com' },
     { id: 'afp', nombre: 'AFP', tipoFuente: 'Agencia internacional de noticias', idioma: 'es', ambito: 'internacional', especializado: false,

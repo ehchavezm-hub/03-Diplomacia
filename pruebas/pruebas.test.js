@@ -161,7 +161,7 @@ describe('Fuentes de prestigio', () => {
 
   test('agencias vía Google Noticias: titular limpio y enlace del sitio', () => {
     const reuters = Fuentes.medios.find((m) => m.id === 'reuters');
-    assert.match(rss.urlDe(reuters), /news\.google\.com\/rss\/search\?q=site%3Areuters\.com%2Fworld/);
+    assert.match(rss.urlDe(reuters), /news\.google\.com\/rss\/search\?q=site%3Areuters\.com\+when%3A7d/);
     const xml = `<rss><item><title>US and China resume trade talks - Reuters</title>
       <link>https://news.google.com/rss/articles/abc</link><pubDate>Fri, 25 Sep 2026 10:00:00 GMT</pubDate>
       <description>&lt;a href="x"&gt;US and China resume trade talks&lt;/a&gt; Reuters</description></item></rss>`;

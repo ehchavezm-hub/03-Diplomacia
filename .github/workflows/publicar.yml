@@ -45,16 +45,6 @@ jobs:
       - name: Marcar la versión publicada (evita que el navegador mezcle archivos viejos y nuevos)
         run: sed -i "s/__VERSION__/${GITHUB_SHA::8}-${GITHUB_RUN_NUMBER}/g" public/index.html
 
-      # TEMPORAL: comprueba la búsqueda de GDELT con la lista completa de sitios y Google Noticias.
-      - name: Diagnóstico de servicios de búsqueda
-        continue-on-error: true
-        run: |
-          set +e
-          URL=$(node -e "console.log(require('./public/js/gdelt.js').construirUrl('trump'))")
-          echo "Largo de la consulta GDELT: ${#URL}"
-          curl -s -m 60 -o /tmp/g -w "GDELT codigo=%{http_code} tiempo=%{time_total}s\n" "$URL"; head -c 300 /tmp/g; echo
-          curl -s -m 20 -A "Mozilla/5.0" -o /tmp/n -w "Google Noticias codigo=%{http_code}\n" "https://news.google.com/rss/search?q=site:reuters.com/world+when:3d&hl=es-419&gl=PE&ceid=PE:es-419"; grep -o "<item>" /tmp/n | wc -l
-
       - name: Preparar la web para GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
