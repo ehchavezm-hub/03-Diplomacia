@@ -66,13 +66,12 @@
     DG.Interfaz.mostrarCargandoZona(zona, estado);
     if (consulta) estado.textContent = 'Buscando «' + consulta + '» en las fuentes de prestigio… un momento, por favor.';
 
-    DG.Datos.buscar({ consulta: consulta, tipo: tipo }).then(function (r) {
-      if (turno !== turnoBusqueda) return; // llegó una búsqueda más nueva
-      mostrarAvisoServidor(r);
-      var resultados = r.resultados; // ya vienen de lo más reciente a lo más antiguo
+    function mostrar(resultados, buscandoMas) {
       var n = resultados.length;
       var mensaje;
-      if (!n) {
+      if (!n && buscandoMas) {
+        mensaje = 'Buscando «' + consulta + '» en agencias de noticias y medios de prestigio… puede tardar unos segundos.';
+      } else if (!n) {
         mensaje = 'No encontramos resultados para «' + consulta + '»' + NOMBRE_TIPO[tipo] +
                   '. Pruebe con otras palabras, elija «Todos» o pulse uno de los temas sugeridos.';
       } else if (consulta) {
@@ -86,7 +85,26 @@
         vacioNacional: 'No encontramos publicaciones nacionales' + sobre + '.',
         vacioInternacional: 'No encontramos publicaciones internacionales' + sobre + '.'
       });
-      if (consulta && (tipo === 'todos' || tipo === 'noticia')) zona.appendChild(enlaceGoogleNoticias(consulta));
+      if (buscandoMas) {
+        if (n) estado.textContent += ' Seguimos buscando más en agencias y medios de prestigio…';
+        estado.classList.add('cargando');
+      }
+      if (consulta && !buscandoMas && (tipo === 'todos' || tipo === 'noticia')) zona.appendChild(enlaceGoogleNoticias(consulta));
+    }
+
+    DG.Datos.buscar({ consulta: consulta, tipo: tipo }).then(function (r) {
+      if (turno !== turnoBusqueda) return; // llegó una búsqueda más nueva
+      mostrarAvisoServidor(r);
+      // Paso 1: lo guardado, enseguida (ya viene de lo más reciente a lo más antiguo).
+      mostrar(r.resultados, !!r.masResultados);
+      // Paso 2: lo que llega de internet unos segundos después.
+      if (r.masResultados) {
+        r.masResultados.then(function (todos) {
+          if (turno === turnoBusqueda) mostrar(todos, false);
+        }, function () {
+          if (turno === turnoBusqueda) mostrar(r.resultados, false);
+        });
+      }
     });
   }
 

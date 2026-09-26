@@ -19,6 +19,10 @@
 (function (DG) {
   'use strict';
 
+  // Versión de la web publicada: evita que el navegador use datos guardados de una versión anterior.
+  var VERSION = window.DG_VERSION || '';
+  function conVersion(url) { return VERSION ? url + '?v=' + encodeURIComponent(VERSION) : url; }
+
   var modoPromesa = null;
   var semanaPromesa = null;
   var librosPromesa = null;
@@ -44,6 +48,8 @@
     if (!modoPromesa) {
       modoPromesa = !/^https?:$/.test(window.location.protocol)
         ? Promise.resolve('archivo')
+        // En GitHub Pages no hay servidor: no hace falta preguntar.
+        : /\.github\.io$/.test(window.location.hostname) ? Promise.resolve('web')
         : traer('api/estado', 3000)
           .then(function (d) { return d && d.ok ? 'servidor' : 'web'; })
           .catch(function () { return 'web'; });
@@ -64,7 +70,7 @@
     if (!semanaPromesa) {
       semanaPromesa = modo().then(function (m) {
         if (m === 'archivo') return null;
-        return traer(m === 'servidor' ? 'api/semana' : 'datos/ultima-semana.json', 20000);
+        return traer(m === 'servidor' ? 'api/semana' : conVersion('datos/ultima-semana.json'), 20000);
       }).catch(function () { return null; }).then(function (d) {
         d = d || { generado: null, dias: 7, fuentes: [], resultados: [] };
         conAmbito(d.resultados);
@@ -78,7 +84,7 @@
   function librosRecientes() {
     if (!librosPromesa) {
       librosPromesa = modo().then(function (m) {
-        return m === 'archivo' ? null : traer('datos/libros-recientes.json', 15000);
+        return m === 'archivo' ? null : traer(conVersion('datos/libros-recientes.json'), 15000);
       }).catch(function () { return null; }).then(function (d) {
         return conAmbito((d && d.resultados) || []);
       });
@@ -90,7 +96,7 @@
   function archivoNoticias() {
     if (!archivoPromesa) {
       archivoPromesa = modo().then(function (m) {
-        return m === 'archivo' ? null : traer('datos/noticias-archivo.json', 20000);
+        return m === 'archivo' ? null : traer(conVersion('datos/noticias-archivo.json'), 20000);
       }).catch(function () { return null; }).then(function (d) {
         return conAmbito((d && d.resultados) || []);
       });
@@ -122,7 +128,8 @@
   function buscarNoticias(consulta) {
     var url = window.Gdelt.construirUrl(consulta);
     if (!url) return Promise.resolve([]);
-    return traerTexto(url, 12000).then(window.Gdelt.interpretar).catch(function () { return []; });
+    // GDELT puede tardar 10-20 segundos en responder.
+    return traerTexto(url, 30000).then(window.Gdelt.interpretar).catch(function () { return []; });
   }
 
   function buscarPapers(consulta) {
@@ -132,11 +139,29 @@
   }
 
   function buscarLibros(consulta) {
-    return traer(window.Libros.urlGoogle({ q: consulta, recientes: false }), 10000)
-      .then(function (j) { return window.Libros.interpretarGoogle(j); })
+    // Open Library (Google Books rechaza consultas sin clave por límite de uso).
+    return traer(window.Libros.urlOpenLibrary(consulta), 12000)
+      .then(function (j) { return window.Libros.interpretarOpenLibrary(j); })
       .catch(function () { return []; });
   }
 
+  /** Quita títulos repetidos y ordena de lo más reciente a lo más antiguo. */
+  function unirResultados(listas) {
+    var vistos = {};
+    var todos = [].concat.apply([], listas).filter(function (d) {
+      var clave = window.MotorBusqueda.normalizar(d.titulo);
+      if (vistos[clave]) return false;
+      vistos[clave] = true;
+      return true;
+    });
+    return window.MotorBusqueda.ordenarPorFecha(conAmbito(todos));
+  }
+
+  /**
+   * Búsqueda en dos pasos, para no hacer esperar:
+   *   1) Enseguida: lo guardado (semana, archivo de 90 días, libros recientes y catálogo).
+   *   2) Después: lo que llega de internet (GDELT, Crossref, Open Library), en `masResultados`.
+   */
   function buscarSinServidor(opciones, m) {
     var tipo = opciones.tipo || 'todos';
     var consulta = opciones.consulta || '';
@@ -146,27 +171,26 @@
     return Promise.all([
       datosSemana(),
       librosRecientes(),
-      enVivo && quiere('noticia') ? buscarNoticias(consulta) : [],
-      enVivo && quiere('paper') ? buscarPapers(consulta) : [],
-      enVivo && quiere('libro') ? buscarLibros(consulta) : [],
       consulta && quiere('noticia') ? archivoNoticias() : []
     ]).then(function (r) {
-      var recientes = r[0].resultados.concat(r[5]);
+      var recientes = r[0].resultados.concat(r[2]);
       var hayNoticiasReales = recientes.some(function (d) { return d.tipo === 'noticia'; });
       // Con noticias reales disponibles, las noticias de ejemplo del catálogo se ocultan.
       var catalogo = window.CATALOGO_DIPLOMACIA.filter(function (d) { return !(hayNoticiasReales && d.ejemplo); });
-      var guardados = window.MotorBusqueda.buscar(recientes.concat(r[1], catalogo), opciones);
-      var enLinea = r[2].concat(r[3], r[4]).filter(function (d) { return quiere(d.tipo); });
+      var guardados = unirResultados([window.MotorBusqueda.buscar(recientes.concat(r[1], catalogo), opciones)]);
 
-      // Todo junto y sin repetir títulos.
-      var vistos = {};
-      var todos = guardados.concat(enLinea).filter(function (d) {
-        var clave = window.MotorBusqueda.normalizar(d.titulo);
-        if (vistos[clave]) return false;
-        vistos[clave] = true;
-        return true;
-      });
-      return { resultados: window.MotorBusqueda.ordenarPorFecha(conAmbito(todos)), avisos: [], modo: m };
+      var masResultados = null;
+      if (enVivo) {
+        masResultados = Promise.all([
+          quiere('noticia') ? buscarNoticias(consulta) : [],
+          quiere('paper') ? buscarPapers(consulta) : [],
+          quiere('libro') ? buscarLibros(consulta) : []
+        ]).then(function (v) {
+          var enLinea = v[0].concat(v[1], v[2]).filter(function (d) { return quiere(d.tipo); });
+          return unirResultados([guardados, enLinea]);
+        });
+      }
+      return { resultados: guardados, avisos: [], modo: m, masResultados: masResultados };
     });
   }
 

@@ -9,12 +9,12 @@
   <link rel="icon" href="img/icono.svg" type="image/svg+xml">
 
   <!-- Tailwind CSS ya compilado (no requiere internet). Ver "npm run css" en el README. -->
-  <link rel="stylesheet" href="css/tailwind.css">
+  <link rel="stylesheet" href="css/tailwind.css?v=__VERSION__">
   <!-- Fuente diseñada para personas con baja visión (si no carga, se usa Verdana). -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="css/estilos.css?v=__VERSION__">
 </head>
 <body class="bg-papel text-pizarra font-sans leading-relaxed">
 
@@ -221,16 +221,19 @@
     </form>
   </dialog>
 
+  <!-- Versión publicada: GitHub Actions reemplaza __VERSION__ en cada publicación, para que
+       el navegador descargue siempre los archivos nuevos y nunca mezcle versiones. -->
+  <script>window.DG_VERSION = '__VERSION__';</script>
   <!-- Datos y lógica (archivos separados, en este orden). -->
-  <script src="datos/catalogo.js"></script>
-  <script src="js/fuentes-prestigio.js"></script>
-  <script src="js/crossref.js"></script>
-  <script src="js/gdelt.js"></script>
-  <script src="js/libros.js"></script>
-  <script src="js/motor-busqueda.js"></script>
-  <script src="js/servicio-datos.js"></script>
-  <script src="js/interfaz.js"></script>
-  <script src="js/voz.js"></script>
-  <script src="js/app.js"></script>
+  <script src="datos/catalogo.js?v=__VERSION__"></script>
+  <script src="js/fuentes-prestigio.js?v=__VERSION__"></script>
+  <script src="js/crossref.js?v=__VERSION__"></script>
+  <script src="js/gdelt.js?v=__VERSION__"></script>
+  <script src="js/libros.js?v=__VERSION__"></script>
+  <script src="js/motor-busqueda.js?v=__VERSION__"></script>
+  <script src="js/servicio-datos.js?v=__VERSION__"></script>
+  <script src="js/interfaz.js?v=__VERSION__"></script>
+  <script src="js/voz.js?v=__VERSION__"></script>
+  <script src="js/app.js?v=__VERSION__"></script>
 </body>
 </html>

@@ -4,7 +4,9 @@
  * Única lista de medios, organismos, revistas académicas y editoriales que usa la
  * aplicación. Solo se muestran resultados de estas fuentes.
  *
- * - medios: fuentes RSS para "Novedades de la última semana".
+ * - medios: fuentes RSS para "Novedades de la última semana" y el archivo de 90 días.
+ *     googleNoticias: para agencias y entidades sin RSS propio, búsqueda "site:" en Google
+ *                     Noticias (solo se toman noticias de ese sitio).
  *     ambito: 'nacional' (Perú) o 'internacional'.
  *     especializado: true  -> se toma todo su contenido (secciones de política o
  *                             internacional, organismos, revistas de política exterior).
@@ -27,13 +29,18 @@
     { id: 'el-comercio-mundo', nombre: 'El Comercio — Mundo', tipoFuente: 'Diario de referencia nacional', idioma: 'es', ambito: 'nacional', especializado: false,
       url: 'https://elcomercio.pe/arcio/rss/category/mundo/' },
     { id: 'la-republica', nombre: 'La República — Política', tipoFuente: 'Diario de referencia nacional', idioma: 'es', ambito: 'nacional', especializado: true,
-      url: 'https://larepublica.pe/arcio/rss/category/politica/' },
+      url: 'https://larepublica.pe/rss/politica.xml' },
     { id: 'gestion', nombre: 'Gestión — Perú', tipoFuente: 'Diario de referencia nacional', idioma: 'es', ambito: 'nacional', especializado: true,
       url: 'https://gestion.pe/arcio/rss/category/peru/' },
-    { id: 'peru21', nombre: 'Perú21 — Política', tipoFuente: 'Diario de referencia nacional', idioma: 'es', ambito: 'nacional', especializado: true,
-      url: 'https://peru21.pe/arcio/rss/category/politica/' },
     { id: 'rpp', nombre: 'RPP Noticias — Política', tipoFuente: 'Medio de referencia nacional', idioma: 'es', ambito: 'nacional', especializado: true,
-      url: 'https://rpp.pe/rss/politica' },
+      url: 'https://rpp.pe/feed/politica' },
+    { id: 'rpp-general', nombre: 'RPP Noticias', tipoFuente: 'Medio de referencia nacional', idioma: 'es', ambito: 'nacional', especializado: false,
+      url: 'https://rpp.pe/rss' },
+    // Entidades nacionales sin RSS propio: se leen a través de Google Noticias (solo ese sitio).
+    { id: 'cancilleria', nombre: 'Cancillería del Perú', tipoFuente: 'Entidad oficial', idioma: 'es', ambito: 'nacional', especializado: true,
+      googleNoticias: 'site:gob.pe/institucion/rree' },
+    { id: 'el-peruano', nombre: 'El Peruano (diario oficial)', tipoFuente: 'Entidad oficial', idioma: 'es', ambito: 'nacional', especializado: false,
+      googleNoticias: 'site:elperuano.pe' },
     { id: 'andina', nombre: 'Andina — Agencia Peruana de Noticias', tipoFuente: 'Agencia oficial de noticias', idioma: 'es', ambito: 'nacional', especializado: true,
       url: 'https://andina.pe/agencia/rss/3.aspx' },
 
@@ -43,6 +50,33 @@
       url: 'https://news.un.org/feed/subscribe/es/news/all/rss.xml' },
     { id: 'onu-paz', nombre: 'UN News — Paz y seguridad', tipoFuente: 'Organismo internacional', idioma: 'en', ambito: 'internacional', especializado: true,
       url: 'https://news.un.org/feed/subscribe/en/news/topic/peace-and-security/feed/rss.xml' },
+
+    // Agencias de noticias internacionales (sin RSS público: se leen a través de Google Noticias)
+    { id: 'reuters', nombre: 'Reuters', tipoFuente: 'Agencia internacional de noticias', idioma: 'en', ambito: 'internacional', especializado: false,
+      googleNoticias: 'site:reuters.com/world' },
+    { id: 'ap', nombre: 'Associated Press', tipoFuente: 'Agencia internacional de noticias', idioma: 'en', ambito: 'internacional', especializado: false,
+      googleNoticias: 'site:apnews.com' },
+    { id: 'afp', nombre: 'AFP', tipoFuente: 'Agencia internacional de noticias', idioma: 'es', ambito: 'internacional', especializado: false,
+      googleNoticias: 'site:afp.com' },
+    { id: 'efe', nombre: 'Agencia EFE', tipoFuente: 'Agencia internacional de noticias', idioma: 'es', ambito: 'internacional', especializado: false,
+      googleNoticias: 'site:efe.com' },
+    { id: 'europa-press', nombre: 'Europa Press — Internacional', tipoFuente: 'Agencia internacional de noticias', idioma: 'es', ambito: 'internacional', especializado: false,
+      googleNoticias: 'site:europapress.es/internacional' },
+    { id: 'bloomberg', nombre: 'Bloomberg', tipoFuente: 'Agencia internacional de noticias', idioma: 'en', ambito: 'internacional', especializado: false,
+      googleNoticias: 'site:bloomberg.com' },
+    // Organismos y gobiernos (comunicados oficiales)
+    { id: 'oea', nombre: 'OEA — Organización de los Estados Americanos', tipoFuente: 'Organismo internacional', idioma: 'es', ambito: 'internacional', especializado: true,
+      googleNoticias: 'site:oas.org' },
+    { id: 'ue-exterior', nombre: 'Unión Europea — Servicio de Acción Exterior', tipoFuente: 'Organismo internacional', idioma: 'en', ambito: 'internacional', especializado: true,
+      googleNoticias: 'site:eeas.europa.eu' },
+    { id: 'otan', nombre: 'OTAN', tipoFuente: 'Organismo internacional', idioma: 'en', ambito: 'internacional', especializado: true,
+      googleNoticias: 'site:nato.int' },
+    { id: 'depto-estado', nombre: 'Departamento de Estado de EE. UU.', tipoFuente: 'Gobierno', idioma: 'en', ambito: 'internacional', especializado: true,
+      googleNoticias: 'site:state.gov' },
+    { id: 'fmi', nombre: 'Fondo Monetario Internacional', tipoFuente: 'Organismo internacional', idioma: 'en', ambito: 'internacional', especializado: true,
+      googleNoticias: 'site:imf.org' },
+    { id: 'cepal', nombre: 'CEPAL', tipoFuente: 'Organismo internacional', idioma: 'es', ambito: 'internacional', especializado: true,
+      googleNoticias: 'site:cepal.org' },
 
     // Revistas y centros de análisis de política exterior
     { id: 'foreign-affairs', nombre: 'Foreign Affairs', tipoFuente: 'Revista de política exterior', idioma: 'en', ambito: 'internacional', especializado: true,
@@ -84,15 +118,30 @@
     { dominio: 'gestion.pe', nombre: 'Gestión', ambito: 'nacional' },
     { dominio: 'andina.pe', nombre: 'Andina', ambito: 'nacional' },
     { dominio: 'peru21.pe', nombre: 'Perú21', ambito: 'nacional' },
+    { dominio: 'elperuano.pe', nombre: 'El Peruano', ambito: 'nacional' },
     { dominio: 'ojo-publico.com', nombre: 'Ojo Público', ambito: 'nacional' },
     { dominio: 'idl-reporteros.pe', nombre: 'IDL-Reporteros', ambito: 'nacional' },
     { dominio: 'gob.pe', nombre: 'Gobierno del Perú (gob.pe)', ambito: 'nacional' },
     // Internacional
-    { dominio: 'news.un.org', nombre: 'Noticias ONU', ambito: 'internacional' },
     { dominio: 'bbc.com', nombre: 'BBC', ambito: 'internacional' },
     { dominio: 'elpais.com', nombre: 'El País', ambito: 'internacional' },
     { dominio: 'reuters.com', nombre: 'Reuters', ambito: 'internacional' },
     { dominio: 'apnews.com', nombre: 'Associated Press', ambito: 'internacional' },
+    { dominio: 'afp.com', nombre: 'AFP', ambito: 'internacional' },
+    { dominio: 'efe.com', nombre: 'Agencia EFE', ambito: 'internacional' },
+    { dominio: 'europapress.es', nombre: 'Europa Press', ambito: 'internacional' },
+    { dominio: 'bloomberg.com', nombre: 'Bloomberg', ambito: 'internacional' },
+    { dominio: 'ansa.it', nombre: 'ANSA', ambito: 'internacional' },
+    { dominio: 'dpa-international.com', nombre: 'DPA', ambito: 'internacional' },
+    { dominio: 'un.org', nombre: 'Naciones Unidas', ambito: 'internacional' },
+    { dominio: 'oas.org', nombre: 'OEA', ambito: 'internacional' },
+    { dominio: 'europa.eu', nombre: 'Unión Europea', ambito: 'internacional' },
+    { dominio: 'nato.int', nombre: 'OTAN', ambito: 'internacional' },
+    { dominio: 'state.gov', nombre: 'Departamento de Estado de EE. UU.', ambito: 'internacional' },
+    { dominio: 'imf.org', nombre: 'FMI', ambito: 'internacional' },
+    { dominio: 'worldbank.org', nombre: 'Banco Mundial', ambito: 'internacional' },
+    { dominio: 'cepal.org', nombre: 'CEPAL', ambito: 'internacional' },
+    { dominio: 'wto.org', nombre: 'OMC', ambito: 'internacional' },
     { dominio: 'france24.com', nombre: 'France 24', ambito: 'internacional' },
     { dominio: 'dw.com', nombre: 'DW', ambito: 'internacional' },
     { dominio: 'theguardian.com', nombre: 'The Guardian', ambito: 'internacional' },

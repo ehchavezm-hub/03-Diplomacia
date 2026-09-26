@@ -22,6 +22,16 @@ function enlaceAtom(xml) {
   return alterno ? alterno[1] : '';
 }
 
+/** Dirección RSS de Google Noticias limitada a un sitio (para agencias y entidades sin RSS). */
+function urlGoogleNoticias(medio) {
+  const params = new URLSearchParams({ q: `${medio.googleNoticias} when:3d`, hl: 'es-419', gl: 'PE', ceid: 'PE:es-419' });
+  return `https://news.google.com/rss/search?${params}`;
+}
+
+function urlDe(medio) {
+  return medio.url || urlGoogleNoticias(medio);
+}
+
 function aFecha(texto) {
   const t = Date.parse(texto);
   return isNaN(t) ? '' : new Date(t).toISOString();
@@ -38,8 +48,13 @@ function interpretarRss(xml, medio) {
 
   return bloques.map((b) => {
     const enlace = etiqueta(b, 'link') || enlaceAtom(b) || etiqueta(b, 'guid');
-    const titulo = etiqueta(b, 'title');
-    const resumen = recortar(etiqueta(b, 'description') || etiqueta(b, 'summary') || etiqueta(b, 'content'), 280);
+    let titulo = etiqueta(b, 'title');
+    let resumen = recortar(etiqueta(b, 'description') || etiqueta(b, 'summary') || etiqueta(b, 'content'), 280);
+    if (medio.googleNoticias) {
+      // Google Noticias añade " - Nombre del medio" al titular y repite el título en la descripción.
+      titulo = titulo.replace(/\s+[-–]\s+[^-–]{2,60}$/, '');
+      resumen = `Publicado por ${medio.nombre}. Pulse «Visitar enlace» para leerlo completo.`;
+    }
     return {
       id: idDesdeTexto('rss', enlace || titulo),
       tipo: 'noticia',
@@ -66,7 +81,7 @@ function interpretarRss(xml, medio) {
 async function leerTodos(ms = config.tiempoEsperaMs) {
   const resultados = await Promise.allSettled(
     Fuentes.medios.map(async (medio) => {
-      const r = await traerConTiempo(medio.url, ms, {
+      const r = await traerConTiempo(urlDe(medio), ms, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DiplomaciaGlobal/1.0)' }
       });
       return interpretarRss(await r.text(), medio);
@@ -86,6 +101,7 @@ module.exports = {
   tipos: ['noticia'],
   interpretarRss,
   leerTodos,
+  urlDe,
 
   async buscar() {
     const { noticias, informe } = await leerTodos();

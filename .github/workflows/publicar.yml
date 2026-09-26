@@ -42,27 +42,18 @@ jobs:
         timeout-minutes: 5
         run: npm run actualizar
 
-      # TEMPORAL: comprueba servicios de búsqueda (CORS) y direcciones RSS alternativas.
+      - name: Marcar la versión publicada (evita que el navegador mezcle archivos viejos y nuevos)
+        run: sed -i "s/__VERSION__/${GITHUB_SHA::8}-${GITHUB_RUN_NUMBER}/g" public/index.html
+
+      # TEMPORAL: comprueba la búsqueda de GDELT con la lista completa de sitios y Google Noticias.
       - name: Diagnóstico de servicios de búsqueda
         continue-on-error: true
         run: |
           set +e
-          probar() {
-            echo "=== $1"
-            curl -s -m "$2" -A "Mozilla/5.0" -D /tmp/cab -o /tmp/cuerpo -w "codigo=%{http_code} tiempo=%{time_total}s\n" -H "Origin: https://ehchavezm-hub.github.io" "$1"
-            grep -i -E "access-control-allow-origin|content-type" /tmp/cab
-            head -c 300 /tmp/cuerpo | tr '\n' ' '; echo
-          }
-          probar "https://api.gdeltproject.org/api/v2/doc/doc?query=fujimori%20domainis:elcomercio.pe&mode=ArtList&format=json&maxrecords=3&sort=DateDesc" 60
-          probar "https://www.googleapis.com/books/v1/volumes?q=subject:diplomacy&orderBy=newest&maxResults=2" 20
-          probar "https://openlibrary.org/search.json?q=diplomacy&limit=1&fields=title" 20
-          probar "https://api.crossref.org/works?rows=1&query=peru" 20
-          for u in \
-            https://larepublica.pe/rss/politica.xml https://larepublica.pe/arc/outboundfeeds/rss/category/politica/ https://larepublica.pe/arcio/rss/ https://larepublica.pe/rss/ \
-            https://peru21.pe/arcio/rss/ https://peru21.pe/arc/outboundfeeds/rss/category/politica/ https://peru21.pe/feed/ https://peru21.pe/rss/politica.xml \
-            https://rpp.pe/feed https://rpp.pe/rss https://rpp.pe/rss/politica.xml https://rpp.pe/feed/politica; do
-            probar "$u" 20
-          done
+          URL=$(node -e "console.log(require('./public/js/gdelt.js').construirUrl('trump'))")
+          echo "Largo de la consulta GDELT: ${#URL}"
+          curl -s -m 60 -o /tmp/g -w "GDELT codigo=%{http_code} tiempo=%{time_total}s\n" "$URL"; head -c 300 /tmp/g; echo
+          curl -s -m 20 -A "Mozilla/5.0" -o /tmp/n -w "Google Noticias codigo=%{http_code}\n" "https://news.google.com/rss/search?q=site:reuters.com/world+when:3d&hl=es-419&gl=PE&ceid=PE:es-419"; grep -o "<item>" /tmp/n | wc -l
 
       - name: Preparar la web para GitHub Pages
         uses: actions/upload-pages-artifact@v3

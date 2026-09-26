@@ -137,7 +137,8 @@ describe('Fuentes de prestigio', () => {
     for (const m of Fuentes.medios) {
       assert.ok(m.id && m.nombre && m.tipoFuente, m.id);
       assert.ok(['es', 'en'].includes(m.idioma), m.id);
-      assert.match(m.url, /^https:\/\//, m.id);
+      assert.match(rss.urlDe(m), /^https:\/\//, m.id);
+      assert.ok(['nacional', 'internacional'].includes(m.ambito), m.id);
     }
     assert.ok(Fuentes.revistas.every((r) => /^\d{4}-\d{3}[\dX]$/.test(r.issn)));
   });
@@ -156,6 +157,18 @@ describe('Fuentes de prestigio', () => {
     assert.deepEqual(general.map((n) => n.titulo), ['Cumbre del G20 termina con acuerdo']);
     const especializado = rss.interpretarRss(xml, { nombre: 'Revista', especializado: true });
     assert.equal(especializado.length, 2);
+  });
+
+  test('agencias vía Google Noticias: titular limpio y enlace del sitio', () => {
+    const reuters = Fuentes.medios.find((m) => m.id === 'reuters');
+    assert.match(rss.urlDe(reuters), /news\.google\.com\/rss\/search\?q=site%3Areuters\.com%2Fworld/);
+    const xml = `<rss><item><title>US and China resume trade talks - Reuters</title>
+      <link>https://news.google.com/rss/articles/abc</link><pubDate>Fri, 25 Sep 2026 10:00:00 GMT</pubDate>
+      <description>&lt;a href="x"&gt;US and China resume trade talks&lt;/a&gt; Reuters</description></item></rss>`;
+    const [n] = rss.interpretarRss(xml, reuters);
+    assert.equal(n.titulo, 'US and China resume trade talks');
+    assert.equal(n.fuente, 'Reuters');
+    assert.match(n.resumen, /^Publicado por Reuters/);
   });
 
   test('también entiende feeds Atom', () => {
