@@ -20,8 +20,11 @@ const catalogoLocal = require('./fuentes/catalogo-local');
 const crossref = require('./fuentes/crossref');
 const noticiasRss = require('./fuentes/noticias-rss');
 const bibliotecaPersonal = require('./fuentes/biblioteca-personal');
+const noticiasGdelt = require('./fuentes/noticias-gdelt');
+const librosRecientes = require('./fuentes/libros-recientes');
+const Fuentes = require('../public/js/fuentes-prestigio.js');
 
-const FUENTES_EN_VIVO = [noticiasRss, crossref];
+const FUENTES_EN_VIVO = [noticiasRss, noticiasGdelt, crossref, librosRecientes];
 const cache = crearCache(config.cacheMinutos);
 
 // Resultados externos recientes, para poder descargarlos por su id.
@@ -78,7 +81,7 @@ async function buscar({ consulta = '', tipo = 'todos', limite = 200 } = {}) {
   // Orden: noticias reales más recientes primero; luego fragmentos de su biblioteca;
   // luego el catálogo; por último papers externos.
   const noticiasReales = externos.filter((d) => d.tipo === 'noticia');
-  const papersExternos = externos.filter((d) => d.tipo === 'paper');
+  const papersExternos = externos.filter((d) => d.tipo !== 'noticia');
   // Si hay noticias reales, las noticias de ejemplo se ocultan.
   const localesFiltrados = noticiasReales.length ? locales.filter((d) => !d.ejemplo) : locales;
 
@@ -91,6 +94,8 @@ async function buscar({ consulta = '', tipo = 'todos', limite = 200 } = {}) {
     titulos.add(clave);
     unicos.push(d);
   }
+  // Cada resultado se marca como nacional (Perú) o internacional.
+  unicos.forEach((d) => { d.ambito = Fuentes.ambitoDe(d); });
   // De lo más reciente a lo más antiguo ("de hoy hacia atrás").
   return { resultados: Motor.ordenarPorFecha(unicos).slice(0, limite), avisos };
 }

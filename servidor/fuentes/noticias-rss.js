@@ -48,6 +48,7 @@ function interpretarRss(xml, medio) {
       autor: etiqueta(b, 'dc:creator') || etiqueta(b, 'name') || medio.nombre,
       fuente: medio.nombre,
       tipoFuente: medio.tipoFuente || 'Medio de referencia',
+      ambito: medio.ambito || 'internacional',
       idioma: medio.idioma || 'es',
       fecha: aFecha(etiqueta(b, 'pubDate') || etiqueta(b, 'dc:date') || etiqueta(b, 'published') || etiqueta(b, 'updated')),
       enlace,

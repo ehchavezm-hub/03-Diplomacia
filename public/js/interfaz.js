@@ -132,8 +132,8 @@
       visitar.target = '_blank';
       visitar.rel = 'noopener noreferrer';
       visitar.appendChild(icono('enlace'));
-      visitar.appendChild(document.createTextNode('Visitar enlace original'));
-      visitar.appendChild(crear('span', 'sr-only', ' (se abre en una pestaña nueva)'));
+      visitar.appendChild(document.createTextNode('Visitar enlace'));
+      visitar.appendChild(crear('span', 'sr-only', ' original (se abre en una pestaña nueva)'));
       botones.appendChild(visitar);
     }
 
@@ -147,14 +147,9 @@
       descargar.target = '_blank';
       descargar.rel = 'noopener';
       descargar.appendChild(icono('descarga'));
-      descargar.appendChild(document.createTextNode('Descargar documento (' + doc.descarga.formato + ')'));
+      descargar.appendChild(document.createTextNode('Descargar ' + doc.descarga.formato));
       descargar.addEventListener('click', function () { acciones.alDescargar(doc); });
       botones.appendChild(descargar);
-    } else if (!doc.fragmento && doc.tipo !== 'noticia') {
-      var nota = crear('p', 'nota-sin-descarga');
-      nota.appendChild(icono('info'));
-      nota.appendChild(document.createTextNode('No es de descarga libre. Puede leerlo en el enlace original.'));
-      botones.appendChild(nota);
     }
 
     var compartir = crear('a', 'boton boton-whatsapp');
@@ -162,11 +157,15 @@
     compartir.target = '_blank';
     compartir.rel = 'noopener noreferrer';
     compartir.appendChild(icono('whatsapp'));
-    compartir.appendChild(document.createTextNode('Compartir por WhatsApp'));
-    compartir.appendChild(crear('span', 'sr-only', ' (se abre WhatsApp en una pestaña nueva)'));
+    compartir.appendChild(document.createTextNode('WhatsApp'));
+    compartir.setAttribute('aria-label', 'Compartir por WhatsApp (se abre en una pestaña nueva)');
     compartir.addEventListener('click', function () { acciones.alCompartir(doc); });
     botones.appendChild(compartir);
 
+    // Contenido a la izquierda y botones pequeños arriba a la derecha, uno debajo del otro.
+    var contenido = crear('div', 'contenido-tarjeta');
+    while (tarjeta.firstChild) contenido.appendChild(tarjeta.firstChild);
+    tarjeta.appendChild(contenido);
     tarjeta.appendChild(botones);
     item.appendChild(tarjeta);
     return item;
@@ -225,6 +224,59 @@
     estado.classList.add('cargando');
   }
 
+  var AMBITOS = [
+    { id: 'nacional', titulo: 'Nacional (Perú)', icono: '<path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>' },
+    { id: 'internacional', titulo: 'Internacional', icono: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>' }
+  ];
+
+  /**
+   * Muestra los resultados en dos secciones: Nacional (Perú) e Internacional.
+   * @param {HTMLElement} zona    Contenedor donde se dibujan las dos secciones.
+   * @param {HTMLElement} estado  Mensaje general (se anuncia a lectores de pantalla).
+   * @param {Object} textos       { vacioNacional, vacioInternacional } mensajes si una sección queda vacía.
+   */
+  function mostrarPorAmbito(zona, estado, resultados, mensaje, acciones, textos) {
+    textos = textos || {};
+    zona.replaceChildren();
+    estado.classList.remove('cargando');
+    estado.textContent = mensaje;
+    if (!resultados.length) return;
+
+    AMBITOS.forEach(function (a) {
+      var docs = resultados.filter(function (d) { return (d.ambito || 'internacional') === a.id; });
+      var seccion = crear('section', 'bloque-ambito');
+      seccion.setAttribute('data-ambito', a.id);
+      var idTitulo = zona.id + '-' + a.id;
+      seccion.setAttribute('aria-labelledby', idTitulo);
+
+      var titulo = crear('h2', 'titulo-ambito titular t-h2');
+      titulo.id = idTitulo;
+      var svg = document.createElement('span');
+      svg.innerHTML = '<svg class="icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + a.icono + '</svg>';
+      titulo.appendChild(svg.firstChild);
+      titulo.appendChild(document.createTextNode(a.titulo));
+      titulo.appendChild(crear('span', 'contador-ambito', String(docs.length)));
+      seccion.appendChild(titulo);
+
+      var estadoSeccion = crear('p', 'estado-ambito t-nota');
+      var lista = crear('ol', 'lista-resultados');
+      lista.setAttribute('aria-labelledby', idTitulo);
+      seccion.appendChild(estadoSeccion);
+      seccion.appendChild(lista);
+      zona.appendChild(seccion);
+
+      var vacio = a.id === 'nacional' ? textos.vacioNacional : textos.vacioInternacional;
+      mostrarResultados(lista, estadoSeccion, docs,
+        docs.length ? 'De la más reciente a la más antigua.' : (vacio || 'No hay resultados en esta sección.'), acciones);
+    });
+  }
+
+  function mostrarCargandoZona(zona, estado) {
+    zona.replaceChildren();
+    estado.textContent = 'Buscando… un momento, por favor.';
+    estado.classList.add('cargando');
+  }
+
   var temporizadorAviso;
   /** Mensaje flotante que desaparece solo (y que leen los lectores de pantalla). */
   function avisar(texto, tipo) {
@@ -240,6 +292,8 @@
     crearTarjeta: crearTarjeta,
     mostrarResultados: mostrarResultados,
     mostrarCargando: mostrarCargando,
+    mostrarPorAmbito: mostrarPorAmbito,
+    mostrarCargandoZona: mostrarCargandoZona,
     avisar: avisar,
     formatearFecha: formatearFecha,
     haceCuanto: haceCuanto

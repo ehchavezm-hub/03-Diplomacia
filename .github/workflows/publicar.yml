@@ -42,6 +42,21 @@ jobs:
         timeout-minutes: 5
         run: npm run actualizar
 
+      # TEMPORAL: comprueba que el navegador puede consultar directamente estos servicios (CORS).
+      - name: Diagnóstico de servicios de búsqueda
+        continue-on-error: true
+        run: |
+          for url in \
+            "https://api.gdeltproject.org/api/v2/doc/doc?query=fujimori%20domainis:elcomercio.pe&mode=ArtList&format=json&maxrecords=3&sort=DateDesc" \
+            "https://www.googleapis.com/books/v1/volumes?q=subject:diplomacy&orderBy=newest&maxResults=2" \
+            "https://openlibrary.org/search.json?q=diplomacy&limit=1&fields=title" \
+            "https://api.crossref.org/works?rows=1&query=peru"; do
+            echo "=== $url"
+            curl -s -m 20 -D - -o /tmp/cuerpo -H "Origin: https://ehchavezm-hub.github.io" "$url" | grep -i -E "^HTTP|access-control-allow-origin|content-type"
+            head -c 400 /tmp/cuerpo; echo
+            sleep 6
+          done
+
       - name: Preparar la web para GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:

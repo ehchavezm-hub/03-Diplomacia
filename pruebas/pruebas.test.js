@@ -169,6 +169,73 @@ describe('Fuentes de prestigio', () => {
   });
 });
 
+describe('Buscador de noticias (GDELT)', () => {
+  const Gdelt = require('../public/js/gdelt.js');
+
+  test('busca la frase exacta solo en sitios de prestigio, lo más nuevo primero', () => {
+    const url = new URL(Gdelt.construirUrl('alberto fujimori'));
+    const q = url.searchParams.get('query');
+    assert.match(q, /^"alberto fujimori" \(domainis:elcomercio\.pe OR /);
+    assert.match(q, /domainis:bbc\.com/);
+    assert.equal(url.searchParams.get('sort'), 'DateDesc');
+    assert.equal(Gdelt.construirUrl('a y o'), null); // palabras demasiado cortas
+  });
+
+  test('convierte artículos, separa nacional e internacional y descarta sitios no incluidos', () => {
+    const json = JSON.stringify({ articles: [
+      { url: 'https://elcomercio.pe/politica/nota-1', title: 'Fujimori: nueva audiencia', seendate: '20260925T143000Z', domain: 'elcomercio.pe', language: 'Spanish' },
+      { url: 'https://www.bbc.com/mundo/articles/x', title: 'Perú y Chile firman acuerdo', seendate: '20260924T090000Z', domain: 'bbc.com', language: 'Spanish' },
+      { url: 'https://blog-desconocido.com/x', title: 'Rumor sin fuente', seendate: '20260926T090000Z', domain: 'blog-desconocido.com', language: 'Spanish' }
+    ] });
+    const docs = Gdelt.interpretar(json);
+    assert.equal(docs.length, 2);
+    assert.equal(docs[0].ambito, 'nacional');
+    assert.equal(docs[0].fuente, 'El Comercio');
+    assert.equal(docs[0].fecha, '2026-09-25T14:30:00.000Z');
+    assert.equal(docs[1].ambito, 'internacional');
+    assert.deepEqual(Gdelt.interpretar('Your query was too short'), []);
+  });
+});
+
+describe('Libros recientes', () => {
+  const Libros = require('../public/js/libros.js');
+  const volumen = (editorial, fecha) => ({ id: 'x' + editorial + fecha, volumeInfo: {
+    title: 'Diplomacy Today', publisher: editorial, publishedDate: fecha, authors: ['A. Autor'], description: 'Texto.'
+  } });
+
+  test('solo acepta editoriales de prestigio y años recientes', () => {
+    const docs = Libros.interpretarGoogle({ items: [
+      volumen('Oxford University Press', '2025-03-01'),
+      volumen('Editorial Desconocida', '2025-01-01'),
+      volumen('Routledge', '2019')
+    ] }, 2023);
+    assert.equal(docs.length, 1);
+    assert.equal(docs[0].fuente, 'Oxford University Press');
+    assert.equal(docs[0].tipo, 'libro');
+  });
+
+  test('Open Library como respaldo', () => {
+    const docs = Libros.interpretarOpenLibrary({ docs: [
+      { key: '/works/OL1W', title: 'Geopolítica del Perú', publisher: ['Fondo Editorial PUCP'], first_publish_year: 2024 },
+      { key: '/works/OL2W', title: 'Otro', publisher: ['Imprenta X'], first_publish_year: 2025 }
+    ] }, 2023);
+    assert.equal(docs.length, 1);
+    assert.equal(docs[0].ambito, 'nacional');
+  });
+});
+
+describe('Nacional o internacional', () => {
+  test('según la fuente o, si no la hay, según el tema', () => {
+    assert.equal(Fuentes.ambitoDe({ tipo: 'noticia', enlace: 'https://rpp.pe/politica/x' }), 'nacional');
+    assert.equal(Fuentes.ambitoDe({ tipo: 'noticia', enlace: 'https://www.nytimes.com/x' }), 'internacional');
+    assert.equal(Fuentes.ambitoDe({ tipo: 'paper', titulo: 'Political Support for President Fujimori' }), 'nacional');
+    assert.equal(Fuentes.ambitoDe({ tipo: 'libro', titulo: 'Diplomacia' }), 'internacional');
+    const xml = '<rss><item><title>Congreso aprueba ley</title><link>https://larepublica.pe/x</link></item></rss>';
+    const [n] = rss.interpretarRss(xml, Fuentes.medios.find((m) => m.id === 'la-republica'));
+    assert.equal(n.ambito, 'nacional');
+  });
+});
+
 describe('Novedades de la última semana', () => {
   test('solo últimos 7 días, sin duplicados, de lo más nuevo a lo más antiguo', async () => {
     const ahora = new Date('2026-09-26T12:00:00Z');

@@ -89,8 +89,8 @@
       <!-- ============ NOVEDADES DE LA ÚLTIMA SEMANA ============ -->
       <div class="caja-semana mb-8">
         <div class="flex-1">
-          <h2 class="titular t-h2 text-pizarra">¿Qué pasó esta semana en el mundo?</h2>
-          <p class="t-cuerpo mt-1">Lo más importante de los <strong>últimos 7 días</strong>, solo de fuentes de gran prestigio: la ONU, Foreign Affairs, BBC, El País y revistas académicas líderes.</p>
+          <h2 class="titular t-h2 text-pizarra">¿Qué pasó esta semana en el Perú y el mundo?</h2>
+          <p class="t-cuerpo mt-1">Lo más importante de los <strong>últimos 7 días</strong>, solo de fuentes de gran prestigio: El Comercio, La República, RPP, Andina, la ONU, Foreign Affairs, BBC, El País y revistas académicas líderes.</p>
           <p class="t-nota mt-1 text-gris">Si antes escribe un tema en la caja de búsqueda, le mostraremos solo las novedades sobre ese tema.</p>
         </div>
         <button type="button" id="btn-semana" class="boton boton-semana">
@@ -154,16 +154,16 @@
           </fieldset>
         </div>
         <p id="estado-buscar" class="estado-resultados" role="status" aria-live="polite"></p>
-        <ol id="lista-buscar" class="lista-resultados" aria-labelledby="estado-buscar"></ol>
+        <div id="zona-buscar"></div>
       </div>
     </section>
 
     <!-- ======================= SECCIÓN: NOTICIAS ======================= -->
     <section id="seccion-noticias" data-seccion="noticias" aria-labelledby="titulo-noticias" hidden>
       <h1 id="titulo-noticias" class="titular t-h1 text-clarete mb-2" tabindex="-1">Últimas Noticias</h1>
-      <p class="t-cuerpo mb-6">Noticias de los últimos 7 días sobre diplomacia y relaciones entre países, de la más nueva a la más antigua. Solo de organismos internacionales y medios de referencia mundial.</p>
+      <p class="t-cuerpo mb-6">Noticias de los últimos 7 días, de la más nueva a la más antigua, en dos secciones: nacional (Perú) e internacional. Solo de medios de referencia y organismos internacionales.</p>
       <p id="estado-noticias" class="estado-resultados" role="status" aria-live="polite"></p>
-      <ol id="lista-noticias" class="lista-resultados" aria-labelledby="titulo-noticias"></ol>
+      <div id="zona-noticias"></div>
     </section>
 
     <!-- ======================= SECCIÓN: PAPERS ======================= -->
@@ -177,7 +177,7 @@
     <!-- ======================= SECCIÓN: LIBROS ======================= -->
     <section id="seccion-libros" data-seccion="libros" aria-labelledby="titulo-libros" hidden>
       <h1 id="titulo-libros" class="titular t-h1 text-clarete mb-2" tabindex="-1">Libros Destacados</h1>
-      <p class="t-cuerpo mb-6">Obras clásicas y actuales para entender la diplomacia. Los libros antiguos de dominio público se pueden descargar.</p>
+      <p class="t-cuerpo mb-6">Libros publicados en los últimos años por editoriales de prestigio, y después las obras clásicas. Del más reciente al más antiguo.</p>
       <p id="estado-libros" class="estado-resultados" role="status" aria-live="polite"></p>
       <ol id="lista-libros" class="lista-resultados" aria-labelledby="titulo-libros"></ol>
     </section>
@@ -186,10 +186,11 @@
   <footer class="bg-papel-suave border-t-4 border-clarete mt-12">
     <div class="max-w-5xl mx-auto px-4 py-8 t-nota space-y-3">
       <p class="titular t-h2 text-clarete">Fuentes de prestigio que consultamos</p>
-      <p><strong>Organismos:</strong> Naciones Unidas (Noticias ONU). <strong>Análisis:</strong> Foreign Affairs, Foreign Policy, The Diplomat, International Crisis Group, Brookings.
-         <strong>Medios de referencia:</strong> BBC, El País, France 24, DW, The Guardian, The New York Times, Al Jazeera.
+      <p><strong>Nacionales:</strong> El Comercio, La República, RPP, Gestión, Perú21, Andina, Ojo Público, IDL-Reporteros y gob.pe.
+         <strong>Organismos:</strong> Naciones Unidas (Noticias ONU). <strong>Análisis:</strong> Foreign Affairs, Foreign Policy, The Diplomat, International Crisis Group, Brookings.
+         <strong>Medios de referencia:</strong> BBC, El País, Reuters, AP, France 24, DW, The Guardian, The New York Times, The Washington Post, Financial Times, The Economist, Al Jazeera.
          <strong>Revistas académicas:</strong> International Organization, International Security, World Politics, International Affairs y otras.
-         <strong>Documentos y libros:</strong> ONU (tratados oficiales) y Proyecto Gutenberg.</p>
+         <strong>Libros:</strong> editoriales universitarias y académicas de prestigio (Oxford, Cambridge, Princeton, Routledge, Fondo Editorial PUCP, IEP y otras), tratados de la ONU y Proyecto Gutenberg.</p>
       <p class="text-gris">Las tarjetas marcadas <strong>«Contenido de ejemplo»</strong> solo aparecen si no hay conexión con las fuentes: explican un tema, no son noticias reales.</p>
       <p id="pie-actualizado" class="text-gris"></p>
     </div>
@@ -208,9 +209,9 @@
       <li>¿Quiere saber qué pasó en los últimos días? Pulse el botón amarillo <strong>Ver novedades de la última semana</strong>.</li>
       <li>En cada resultado puede:
         <ul class="list-disc pl-7 mt-2 space-y-1">
-          <li><strong>Visitar enlace original</strong>: abre la página de origen en una pestaña nueva.</li>
+          <li><strong>Visitar enlace</strong> (botón azul, arriba a la derecha): abre la página de origen en una pestaña nueva.</li>
           <li><strong>Descargar documento</strong>: guarda el archivo en su equipo.</li>
-          <li><strong>Compartir por WhatsApp</strong>: envía el enlace a un familiar o amigo.</li>
+          <li><strong>WhatsApp</strong> (botón verde): envía el enlace a un familiar o amigo.</li>
         </ul>
       </li>
       <li>¿Letra pequeña? Use los botones <strong>A+</strong> y <strong>A−</strong> de arriba.</li>
@@ -224,6 +225,8 @@
   <script src="datos/catalogo.js"></script>
   <script src="js/fuentes-prestigio.js"></script>
   <script src="js/crossref.js"></script>
+  <script src="js/gdelt.js"></script>
+  <script src="js/libros.js"></script>
   <script src="js/motor-busqueda.js"></script>
   <script src="js/servicio-datos.js"></script>
   <script src="js/interfaz.js"></script>

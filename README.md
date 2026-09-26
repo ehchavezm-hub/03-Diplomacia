@@ -40,11 +40,28 @@ abra **Publicar Diplomacia Global en GitHub Pages** y pulse **Run workflow**.
 | 🔍 **Buscar** | Escriba un tema, país o autor en la caja grande y pulse **Buscar**. No importan mayúsculas ni tildes, y entiende español e inglés («ONU» = «United Nations»). |
 | 🎙️ **Buscar hablando** | Pulse el botón del micrófono y diga lo que busca (Chrome, Edge o Safari). |
 | 🏷️ **Filtros** | Botones grandes: *Todos*, *Noticias*, *Papers / Investigaciones*, *Libros*. |
-| 🔗 **Visitar enlace original** | Abre la fuente oficial en una pestaña nueva. |
+| 🔗 **Visitar enlace** | Abre la fuente oficial en una pestaña nueva. |
 | ⬇️ **Descargar documento** | Solo en documentos de acceso libre. Un clic y aparece «¡Descarga iniciada con éxito!». |
 | 💬 **Compartir por WhatsApp** | Envía el título y el enlace a un familiar o amigo. |
 | 🔠 **A+ / A−** | Agranda o achica toda la letra (se recuerda para la próxima visita). |
 | 📚 **Mi biblioteca** | Busca **dentro** de sus propios libros (.md o .txt) y muestra el párrafo y el capítulo. |
+
+### Cómo busca
+
+Al escribir un tema y pulsar **Buscar**, la aplicación consulta en ese momento:
+
+| Qué | Fuente | Alcance |
+|---|---|---|
+| **Noticias** | [GDELT](https://www.gdeltproject.org) (índice mundial de noticias, gratuito) | Últimos 3 meses, **solo** en los sitios de prestigio de la lista (`dominios` en `public/js/fuentes-prestigio.js`) |
+| **Papers** | Crossref | Revistas académicas de la lista |
+| **Libros** | Google Books | Solo editoriales de la lista |
+
+Además, usa lo guardado cada 4 horas: novedades de la semana (`ultima-semana.json`) y
+**libros publicados en los últimos 3 años** por editoriales de prestigio (`libros-recientes.json`).
+
+Los resultados se muestran en **dos secciones: Nacional (Perú) e Internacional**, cada una de
+lo más reciente a lo más antiguo. Las noticias se clasifican según el medio; los papers y libros,
+según si tratan del Perú.
 
 ### Solo fuentes de prestigio
 
@@ -53,6 +70,7 @@ se edita solo ese archivo).
 
 | Tipo | Fuentes |
 |---|---|
+| **Medios nacionales (Perú)** | El Comercio, La República, RPP, Gestión, Perú21, Andina; en la búsqueda, también Ojo Público, IDL-Reporteros y gob.pe |
 | **Organismos internacionales** | Noticias ONU (español), UN News — Paz y seguridad |
 | **Revistas y centros de análisis** | Foreign Affairs, Foreign Policy, The Diplomat, International Crisis Group, Brookings Institution |
 | **Medios de referencia mundial** | BBC Mundo, El País, France 24, DW, BBC News, The Guardian, The New York Times, Al Jazeera |

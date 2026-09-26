@@ -81,7 +81,7 @@
       id: idDesdeTexto('crossref', item.DOI),
       tipo: 'paper',
       titulo: limpiarTexto((item.title || ['Sin título'])[0]),
-      resumen: resumen || 'Artículo académico. Pulse «Visitar enlace original» para leer el resumen en la página de la revista.',
+      resumen: resumen || 'Artículo académico. Pulse «Visitar enlace» para leer el resumen en la página de la revista.',
       autor: autores.length > 3 ? autores.slice(0, 3).join(', ') + ' y otros' : (autores.join(', ') || 'Autor no indicado'),
       fuente: limpiarTexto((item['container-title'] || ['Revista académica'])[0]),
       tipoFuente: 'Revista académica',

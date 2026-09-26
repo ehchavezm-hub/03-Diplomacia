@@ -12,6 +12,7 @@
   var NOMBRE_TIPO = { todos: '', noticia: ' en Noticias', paper: ' en Papers', libro: ' en Libros' };
   var cargadas = {};
   var vista = 'busqueda'; // 'busqueda' o 'semana': qué se muestra en la zona de resultados
+  var turnoBusqueda = 0;  // evita que una respuesta lenta reemplace a una búsqueda más nueva
 
   var acciones = {
     alDescargar: function () {
@@ -59,11 +60,14 @@
     $('filtro-idioma').hidden = true;
     var consulta = $('caja-busqueda').value.trim();
     var tipo = tipoElegido();
-    var lista = $('lista-buscar');
+    var zona = $('zona-buscar');
     var estado = $('estado-buscar');
-    DG.Interfaz.mostrarCargando(lista, estado);
+    var turno = ++turnoBusqueda;
+    DG.Interfaz.mostrarCargandoZona(zona, estado);
+    if (consulta) estado.textContent = 'Buscando «' + consulta + '» en las fuentes de prestigio… un momento, por favor.';
 
     DG.Datos.buscar({ consulta: consulta, tipo: tipo }).then(function (r) {
+      if (turno !== turnoBusqueda) return; // llegó una búsqueda más nueva
       mostrarAvisoServidor(r);
       var resultados = r.resultados; // ya vienen de lo más reciente a lo más antiguo
       var n = resultados.length;
@@ -72,13 +76,16 @@
         mensaje = 'No encontramos resultados para «' + consulta + '»' + NOMBRE_TIPO[tipo] +
                   '. Pruebe con otras palabras, elija «Todos» o pulse uno de los temas sugeridos.';
       } else if (consulta) {
-        mensaje = 'Encontramos ' + plural(n, 'resultado', 'resultados') + ' para «' + consulta + '»' + NOMBRE_TIPO[tipo] +
-                  '. Los más recientes, primero.';
+        mensaje = 'Encontramos ' + plural(n, 'resultado', 'resultados') + ' para «' + consulta + '»' + NOMBRE_TIPO[tipo] + '.';
       } else {
         mensaje = plural(n, 'publicación', 'publicaciones') + NOMBRE_TIPO[tipo] +
-                  ', de la más reciente a la más antigua. Escriba un tema para buscar algo concreto.';
+                  '. Escriba un tema para buscar algo concreto.';
       }
-      DG.Interfaz.mostrarResultados(lista, estado, resultados, mensaje, acciones);
+      var sobre = consulta ? ' sobre «' + consulta + '»' : '';
+      DG.Interfaz.mostrarPorAmbito(zona, estado, resultados, mensaje, acciones, {
+        vacioNacional: 'No encontramos publicaciones nacionales' + sobre + '.',
+        vacioInternacional: 'No encontramos publicaciones internacionales' + sobre + '.'
+      });
     });
   }
 
@@ -89,12 +96,14 @@
     $('aviso-modo').hidden = true;
     var consulta = $('caja-busqueda').value.trim();
     var tipo = tipoElegido();
-    var lista = $('lista-buscar');
+    var zona = $('zona-buscar');
     var estado = $('estado-buscar');
-    DG.Interfaz.mostrarCargando(lista, estado);
+    var turno = ++turnoBusqueda;
+    DG.Interfaz.mostrarCargandoZona(zona, estado);
     estado.textContent = 'Buscando las novedades de la última semana… un momento, por favor.';
 
     DG.Datos.semana({ consulta: consulta, idioma: idiomaElegido() }).then(function (r) {
+      if (turno !== turnoBusqueda) return;
       var resultados = r.resultados.filter(function (d) { return tipo === 'todos' || d.tipo === tipo; });
       var sobre = consulta ? ' sobre «' + consulta + '»' : '';
       var hasta = new Date();
@@ -112,9 +121,12 @@
         resultados.forEach(function (d) { fuentes[d.fuente] = true; });
         mensaje = 'Novedades de los últimos ' + r.dias + ' días' + periodo + sobre + NOMBRE_TIPO[tipo] + ': ' +
                   plural(resultados.length, 'publicación', 'publicaciones') + ' de ' +
-                  plural(Object.keys(fuentes).length, 'fuente de prestigio', 'fuentes de prestigio') + '. Las más recientes, primero.';
+                  plural(Object.keys(fuentes).length, 'fuente de prestigio', 'fuentes de prestigio') + '.';
       }
-      DG.Interfaz.mostrarResultados(lista, estado, resultados, mensaje, acciones);
+      DG.Interfaz.mostrarPorAmbito(zona, estado, resultados, mensaje, acciones, {
+        vacioNacional: 'No hay novedades nacionales' + sobre + ' en estos días.',
+        vacioInternacional: 'No hay novedades internacionales' + sobre + ' en estos días.'
+      });
     });
   }
 
@@ -131,19 +143,19 @@
 
   /* ------------------------------ Secciones ------------------------------ */
   function cargarNoticias() {
-    var lista = $('lista-noticias');
+    var zona = $('zona-noticias');
     var estado = $('estado-noticias');
-    DG.Interfaz.mostrarCargando(lista, estado);
+    DG.Interfaz.mostrarCargandoZona(zona, estado);
     DG.Datos.semana().then(function (r) {
       var noticias = r.resultados.filter(function (d) { return d.tipo === 'noticia'; });
       if (noticias.length) {
-        DG.Interfaz.mostrarResultados(lista, estado, noticias,
-          plural(noticias.length, 'noticia', 'noticias') + ' de los últimos ' + r.dias + ' días. Las más recientes, primero.', acciones);
+        DG.Interfaz.mostrarPorAmbito(zona, estado, noticias,
+          plural(noticias.length, 'noticia', 'noticias') + ' de los últimos ' + r.dias + ' días.', acciones);
         return;
       }
       // Sin conexión con las fuentes: se muestran textos explicativos de ejemplo.
       var ejemplos = window.CATALOGO_DIPLOMACIA.filter(function (d) { return d.tipo === 'noticia'; });
-      DG.Interfaz.mostrarResultados(lista, estado, ejemplos,
+      DG.Interfaz.mostrarPorAmbito(zona, estado, ejemplos,
         'En este momento no podemos traer las noticias del día. Mientras tanto, le dejamos estos textos que explican temas de actualidad.', acciones);
     });
   }
