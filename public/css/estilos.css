@@ -171,22 +171,41 @@ header :focus-visible { outline-color: var(--azafran); }
 .pastilla input:checked + span::before { content: "✓"; line-height: 1; }
 .pastilla input:focus-visible + span { outline: 4px solid var(--foco); outline-offset: 3px; }
 
-.sugerencia {
-  min-height: 2.875rem; padding: 0.45rem 1rem;
-  font-size: 0.9375rem; font-weight: 600; color: var(--pizarra); background: var(--papel-suave);
-  border: 2px solid var(--pizarra); border-radius: 0.75rem; cursor: pointer;
+/* ---------- Temas sugeridos: solo texto, sin marco ----------
+ * Colores de grupo (distintos del rojo = nacional y azul = internacional):
+ *   Agenda Contemporánea: Purple Opinion #593380 (8,6 : 1 sobre el fondo)
+ *   Agenda Clásica Vigente: verde FT oscuro #006432 (6,6 : 1 sobre el fondo)
+ */
+.grupos-temas { display: grid; gap: 1.25rem; }
+@media (min-width: 900px) { .grupos-temas { grid-template-columns: 1fr 1fr; gap: 2rem; } }
+.grupo-temas { --color-grupo: #593380; }
+.grupo-temas[data-grupo="clasica"] { --color-grupo: #006432; }
+.grupo-temas h3 {
+  display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem; color: var(--color-grupo);
 }
-.sugerencia:hover { background: var(--papel-palido); }
-.sugerencia[aria-pressed="true"] { background: var(--pizarra); color: #fff; }
+.grupo-temas .lista-temas {
+  /* El margen negativo alinea el texto de los temas con el título del grupo. */
+  display: flex; flex-wrap: wrap; column-gap: 0.25rem; margin-left: -0.55rem;
+}
 
-/* ---------- Grupos de temas sugeridos ---------- */
-.grupos-temas { display: grid; gap: 1rem; }
-@media (min-width: 900px) { .grupos-temas { grid-template-columns: 1fr 1fr; } }
-.grupo-temas {
-  padding: 0.9rem 1rem; background: #fff; border: 2px solid var(--papel-palido); border-radius: 0.9rem;
+.sugerencia {
+  /* Sin borde ni fondo: solo el texto. Alto de 44 px para tocar con comodidad. */
+  min-height: 2.75rem; padding: 0.4rem 0.55rem;
+  font-size: 0.9375rem; font-weight: 600; color: var(--pizarra); text-align: left;
+  background: none; border: 0; border-radius: 0.5rem; cursor: pointer;
+  text-decoration: underline; text-decoration-color: transparent;
+  text-decoration-thickness: 2px; text-underline-offset: 4px;
 }
-.grupo-temas h3 { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.6rem; color: var(--clarete); }
-.grupo-temas[data-grupo="clasica"] h3 { color: var(--oxford); }
+.sugerencia:hover { color: var(--color-grupo); text-decoration-color: currentColor; }
+.sugerencia[aria-pressed="true"] {
+  color: var(--color-grupo); text-decoration-color: currentColor; text-decoration-thickness: 3px;
+}
+
+/* En el teléfono: un tema por línea, alineados a la izquierda bajo su título. */
+@media (max-width: 640px) {
+  .grupo-temas .lista-temas { flex-direction: column; align-items: flex-start; }
+  .sugerencia { min-height: 2.5rem; padding-block: 0.3rem; }
+}
 
 /* ---------- Resultados ---------- */
 .estado-resultados { font-size: 1.1875rem; font-weight: 600; color: var(--pizarra); margin-bottom: 1rem; }

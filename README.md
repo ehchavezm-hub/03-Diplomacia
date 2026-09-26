@@ -298,6 +298,9 @@ combinación cumpla el contraste WCAG AA:
 | Texto secundario | Gray Dark FT `#66605A` | 5,6 : 1 sobre el fondo |
 | Descargas | FT Green, tono oscuro `#007A3D` | 5,5 : 1 con texto blanco |
 | Papers / análisis | Purple Opinion `#593380` | 7,9 : 1 sobre Pink Light |
+| Títulos «Agenda Contemporánea» | Purple Opinion `#593380` | 8,6 : 1 sobre el fondo |
+| Títulos «Agenda Clásica Vigente» | FT Green oscuro `#006432` | 6,6 : 1 sobre el fondo |
+| Sección Nacional / Internacional | Claret (rojo) / Oxford Blue (azul) | — |
 
 El **Gray FT `#A8A49D`** de la plantilla no se usa para texto: sobre el fondo rosado solo alcanza
 2,2 : 1. En su lugar se usa Gray Dark FT. Los titulares van en letra con serifa (Georgia), como

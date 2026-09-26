@@ -39,7 +39,7 @@
       grupo.setAttribute('aria-labelledby', titulo.id);
       grupo.appendChild(titulo);
       var botones = document.createElement('div');
-      botones.className = 'flex flex-wrap gap-2';
+      botones.className = 'lista-temas';
       g.temas.forEach(function (t) {
         var b = document.createElement('button');
         b.type = 'button';
