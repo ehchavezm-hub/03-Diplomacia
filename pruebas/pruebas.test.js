@@ -224,6 +224,17 @@ describe('Libros recientes', () => {
   });
 });
 
+describe('Archivo de noticias (90 días)', () => {
+  const archivo = require('../servidor/archivo');
+  test('suma lo nuevo, quita repetidos y lo que pasa de 90 días', () => {
+    const ahora = new Date('2026-09-26T12:00:00Z');
+    const n = (id, fecha, enlace = 'https://x.pe/' + id) => ({ id, tipo: 'noticia', titulo: 'Titular ' + id, resumen: 'r', fecha, enlace });
+    const anteriores = [n('a', '2026-09-01T00:00:00Z'), n('viejo', '2026-05-01T00:00:00Z'), n('b', '2026-09-20T00:00:00Z')];
+    const nuevas = [n('c', '2026-09-26T08:00:00Z'), n('b', '2026-09-20T00:00:00Z')];
+    assert.deepEqual(archivo.unir(anteriores, nuevas, ahora).map((d) => d.id), ['c', 'b', 'a']);
+  });
+});
+
 describe('Nacional o internacional', () => {
   test('según la fuente o, si no la hay, según el tema', () => {
     assert.equal(Fuentes.ambitoDe({ tipo: 'noticia', enlace: 'https://rpp.pe/politica/x' }), 'nacional');

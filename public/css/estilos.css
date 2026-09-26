@@ -247,6 +247,11 @@ header :focus-visible { outline-color: var(--azafran); }
   padding: 0.1rem 0.6rem; border-radius: 999px; background: var(--papel-suave); color: var(--pizarra);
 }
 .estado-ambito { color: var(--gris); margin-bottom: 0.75rem; }
+.busqueda-respaldo {
+  margin-top: 2rem; padding: 0.9rem 1rem; font-size: 0.9375rem;
+  background: var(--papel-suave); border: 2px dashed var(--gris); border-radius: 0.75rem;
+}
+.busqueda-respaldo a { color: var(--oxford); font-weight: 600; text-decoration: underline; }
 
 /* ---------- Avisos ---------- */
 .aviso-info {

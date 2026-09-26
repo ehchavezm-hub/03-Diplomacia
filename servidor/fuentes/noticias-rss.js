@@ -9,7 +9,7 @@ const config = require('../config');
 const Fuentes = require('../../public/js/fuentes-prestigio.js');
 const { traerConTiempo, limpiarTexto, recortar, idDesdeTexto } = require('./utilidades');
 
-const MAX_POR_MEDIO = 15;
+const MAX_POR_MEDIO = 40;
 
 function etiqueta(xml, nombre) {
   const m = xml.match(new RegExp(`<${nombre}(?:\\s[^>]*)?>([\\s\\S]*?)</${nombre}>`, 'i'));

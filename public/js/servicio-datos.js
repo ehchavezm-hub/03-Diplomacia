@@ -5,8 +5,9 @@
  *   'servidor'  Con "npm start" (http://localhost:3000). Pregunta a /api/buscar y /api/semana.
  *   'web'       Publicada en internet como página estática (GitHub Pages). Usa:
  *                 - el catálogo local,
- *                 - datos/ultima-semana.json y datos/libros-recientes.json
- *                   (los actualiza GitHub Actions varias veces al día),
+ *                 - datos/ultima-semana.json, datos/libros-recientes.json y
+ *                   datos/noticias-archivo.json (noticias de los últimos 90 días, solo se
+ *                   descarga al buscar un tema); los actualiza GitHub Actions cada 4 horas,
  *                 - y, al buscar un tema, consulta directamente desde el navegador:
  *                     GDELT (noticias de los últimos 3 meses en medios de prestigio),
  *                     Crossref (revistas académicas) y Google Books (editoriales de prestigio).
@@ -21,6 +22,7 @@
   var modoPromesa = null;
   var semanaPromesa = null;
   var librosPromesa = null;
+  var archivoPromesa = null;
 
   /** Conexión con tiempo máximo de espera. Devuelve el texto de la respuesta. */
   function traerTexto(url, ms) {
@@ -84,6 +86,18 @@
     return librosPromesa;
   }
 
+  /** Noticias de los últimos 90 días (se descarga solo la primera vez que se busca un tema). */
+  function archivoNoticias() {
+    if (!archivoPromesa) {
+      archivoPromesa = modo().then(function (m) {
+        return m === 'archivo' ? null : traer('datos/noticias-archivo.json', 20000);
+      }).catch(function () { return null; }).then(function (d) {
+        return conAmbito((d && d.resultados) || []);
+      });
+    }
+    return archivoPromesa;
+  }
+
   /**
    * Novedades de los últimos 7 días, opcionalmente filtradas por tema e idioma.
    * @param {{consulta?: string, idioma?: 'todos'|'es', ahora?: Date}} op
@@ -134,9 +148,10 @@
       librosRecientes(),
       enVivo && quiere('noticia') ? buscarNoticias(consulta) : [],
       enVivo && quiere('paper') ? buscarPapers(consulta) : [],
-      enVivo && quiere('libro') ? buscarLibros(consulta) : []
+      enVivo && quiere('libro') ? buscarLibros(consulta) : [],
+      consulta && quiere('noticia') ? archivoNoticias() : []
     ]).then(function (r) {
-      var recientes = r[0].resultados;
+      var recientes = r[0].resultados.concat(r[5]);
       var hayNoticiasReales = recientes.some(function (d) { return d.tipo === 'noticia'; });
       // Con noticias reales disponibles, las noticias de ejemplo del catálogo se ocultan.
       var catalogo = window.CATALOGO_DIPLOMACIA.filter(function (d) { return !(hayNoticiasReales && d.ejemplo); });

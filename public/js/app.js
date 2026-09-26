@@ -86,7 +86,30 @@
         vacioNacional: 'No encontramos publicaciones nacionales' + sobre + '.',
         vacioInternacional: 'No encontramos publicaciones internacionales' + sobre + '.'
       });
+      if (consulta && (tipo === 'todos' || tipo === 'noticia')) zona.appendChild(enlaceGoogleNoticias(consulta));
     });
+  }
+
+  // Sitios de prestigio para la búsqueda de respaldo en Google Noticias (máximo ~10 por el límite de Google).
+  var SITIOS_RESPALDO = ['elcomercio.pe', 'larepublica.pe', 'rpp.pe', 'andina.pe', 'gestion.pe',
+                         'bbc.com', 'elpais.com', 'reuters.com', 'apnews.com', 'dw.com'];
+
+  /** Enlace para seguir buscando el tema en Google Noticias, solo en medios de prestigio. */
+  function enlaceGoogleNoticias(consulta) {
+    var sitios = SITIOS_RESPALDO.map(function (s) { return 'site:' + s; }).join(' OR ');
+    var url = 'https://news.google.com/search?' + new URLSearchParams({
+      q: consulta + ' (' + sitios + ')', hl: 'es-419', gl: 'PE', ceid: 'PE:es-419'
+    }).toString();
+    var caja = document.createElement('p');
+    caja.className = 'busqueda-respaldo';
+    caja.appendChild(document.createTextNode('¿No encuentra lo que busca? '));
+    var a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = 'Buscar «' + consulta + '» en Google Noticias (solo medios de prestigio)';
+    caja.appendChild(a);
+    return caja;
   }
 
   /* ---------------------- Novedades de la última semana ---------------------- */
